@@ -40,14 +40,14 @@ const ProductCard = ({ product }: { product: Product }) => {
         {/* Price */}
         <div className="mb-6">
           <span className="text-muted-foreground text-sm">Investment Price</span>
-          <div className="text-4xl font-serif font-bold text-gradient-gold">${product.price}</div>
+          <div className="text-4xl font-serif font-bold text-gradient-gold">₵{product.price}</div>
         </div>
 
         {/* Math Breakdown */}
         <div className="bg-background/50 rounded-2xl p-5 mb-6 space-y-3 border border-gold/5">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">Daily Income</span>
-            <span className="text-gold font-bold">${dailyIncome.toFixed(2)}/day</span>
+            <span className="text-gold font-bold">₵{dailyIncome.toFixed(2)}/day</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">Generation Period</span>
@@ -56,11 +56,11 @@ const ProductCard = ({ product }: { product: Product }) => {
           <div className="h-px bg-gold/10" />
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">Total Return</span>
-            <span className="text-foreground font-semibold">${dailyIncome.toFixed(2)} × 50 = ${totalReturn}</span>
+            <span className="text-foreground font-semibold">₵{dailyIncome.toFixed(2)} × 50 = ₵{totalReturn}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">Net Profit</span>
-            <span className="text-gold font-bold text-lg">+${totalProfit}</span>
+            <span className="text-gold font-bold text-lg">+₵{totalProfit}</span>
           </div>
           <div className="flex items-center gap-1.5 text-gold">
             <TrendingUp size={16} />
@@ -70,7 +70,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
         {/* CTA */}
         <button className="w-full py-4 rounded-2xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity">
-          Invest ${product.price} Now
+          Invest ₵{product.price} Now
         </button>
       </div>
     </div>

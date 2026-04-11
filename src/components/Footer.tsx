@@ -28,7 +28,14 @@ const Footer = () => {
 
           <div>
             <h4 className="font-serif text-lg font-bold text-foreground mb-4">Contact Us</h4>
-            <p className="text-muted-foreground text-sm">support@lindegas.com</p>
+            <a
+              href="https://whatsapp.com/channel/0029Vb7fjyr4dTnDmhjmml2x"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-gold hover:text-gold/80 transition-colors text-sm font-semibold"
+            >
+              Chat with us on WhatsApp
+            </a>
             <p className="text-muted-foreground text-sm mt-1">Available 24/7</p>
           </div>
         </div>
