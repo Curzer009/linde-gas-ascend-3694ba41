@@ -42,13 +42,13 @@ const ReturnsTable = () => {
                   return (
                     <tr key={p.name} className={`border-b border-gold/5 hover:bg-gold/5 transition-colors ${i === products.length - 1 ? "border-b-0" : ""}`}>
                       <td className="px-6 py-5 font-serif font-bold text-foreground">{p.name}</td>
-                      <td className="px-6 py-5 text-foreground font-semibold">${p.price}</td>
-                      <td className="px-6 py-5 text-gold font-semibold">${daily.toFixed(2)}</td>
+                      <td className="px-6 py-5 text-foreground font-semibold">₵{p.price}</td>
+                      <td className="px-6 py-5 text-gold font-semibold">₵{daily.toFixed(2)}</td>
                       <td className="px-6 py-5 text-foreground">
-                        <span className="text-muted-foreground text-xs">${daily.toFixed(2)} × 50 = </span>
-                        <span className="font-semibold">${total}</span>
+                        <span className="text-muted-foreground text-xs">₵{daily.toFixed(2)} × 50 = </span>
+                        <span className="font-semibold">₵{total}</span>
                       </td>
-                      <td className="px-6 py-5 text-gold font-bold">+${profit}</td>
+                      <td className="px-6 py-5 text-gold font-bold">+₵{profit}</td>
                       <td className="px-6 py-5">
                         <span className="px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-bold">100%</span>
                       </td>
