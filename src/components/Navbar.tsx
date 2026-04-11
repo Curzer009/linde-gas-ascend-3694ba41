@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
@@ -7,15 +8,15 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-gold/10">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center">
             <span className="text-primary-foreground font-serif font-bold text-lg">L</span>
           </div>
           <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {["Products", "How It Works", "Returns", "Contact"].map((item) => (
+          {["How It Works", "Reviews", "Contact"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
@@ -24,12 +25,12 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <a
-            href="#products"
+          <Link
+            to="/signup"
             className="px-6 py-2.5 rounded-full bg-gradient-gold text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
           >
             Get Started
-          </a>
+          </Link>
         </div>
 
         <button className="md:hidden text-foreground" onClick={() => setIsOpen(!isOpen)}>
@@ -39,7 +40,7 @@ const Navbar = () => {
 
       {isOpen && (
         <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-gold/10 px-6 py-6 space-y-4">
-          {["Products", "How It Works", "Returns", "Contact"].map((item) => (
+          {["How It Works", "Reviews", "Contact"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
@@ -49,13 +50,13 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <a
-            href="#products"
+          <Link
+            to="/signup"
             onClick={() => setIsOpen(false)}
             className="block text-center px-6 py-2.5 rounded-full bg-gradient-gold text-primary-foreground font-semibold text-sm"
           >
             Get Started
-          </a>
+          </Link>
         </div>
       )}
     </nav>
