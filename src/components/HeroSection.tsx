@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 import { ArrowDown, TrendingUp, Shield, Clock } from "lucide-react";
 
@@ -30,12 +31,12 @@ const HeroSection = () => {
         </p>
 
         <div className="animate-fade-up-delay-2 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <a
-            href="#products"
+          <Link
+            to="/signup"
             className="px-8 py-4 rounded-full bg-gradient-gold text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity glow-gold"
           >
-            Explore Products
-          </a>
+            Get Started
+          </Link>
           <a
             href="#how-it-works"
             className="px-8 py-4 rounded-full border border-gold/30 text-gold font-semibold text-lg hover:bg-gold/10 transition-colors"
@@ -61,7 +62,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <a href="#products" className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
+      <a href="#how-it-works" className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
         <ArrowDown className="text-gold/60" size={28} />
       </a>
     </section>
