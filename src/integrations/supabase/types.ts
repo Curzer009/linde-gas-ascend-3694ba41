@@ -117,6 +117,8 @@ export type Database = {
           full_name: string
           id: string
           is_suspended: boolean
+          referral_code: string | null
+          referred_by: string | null
           updated_at: string
           user_id: string
           username: string
@@ -127,6 +129,8 @@ export type Database = {
           full_name: string
           id?: string
           is_suspended?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
           updated_at?: string
           user_id: string
           username: string
@@ -137,9 +141,44 @@ export type Database = {
           full_name?: string
           id?: string
           is_suspended?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
           updated_at?: string
           user_id?: string
           username?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          product_name: string | null
+          referred_id: string
+          referrer_id: string
+          reward_amount: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_name?: string | null
+          referred_id: string
+          referrer_id: string
+          reward_amount?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_name?: string | null
+          referred_id?: string
+          referrer_id?: string
+          reward_amount?: number
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
