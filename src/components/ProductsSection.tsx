@@ -1,4 +1,8 @@
-import { TrendingUp, Zap, Wind, Sun, Leaf, FlaskConical } from "lucide-react";
+import { TrendingUp, Zap, Wind, Sun, Leaf, FlaskConical, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   name: string;
@@ -17,16 +21,44 @@ const products: Product[] = [
 ];
 
 const ProductCard = ({ product }: { product: Product }) => {
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
   const totalReturn = product.price * 2;
   const dailyIncome = totalReturn / 50;
   const totalProfit = totalReturn - product.price;
+
+  const handlePayNow = async () => {
+    if (!user) {
+      toast({ title: "Please log in first", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paystack-checkout", {
+        body: { amount: product.price, productName: product.name },
+      });
+
+      if (error) throw error;
+      if (data?.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      toast({ title: "Payment failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="group relative bg-card rounded-3xl border border-gold/10 overflow-hidden hover:border-gold/30 transition-all duration-500 hover:glow-gold">
       <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
       
       <div className="relative p-8">
-        {/* Icon & Name */}
         <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-2xl bg-gradient-gold flex items-center justify-center">
             <product.icon className="text-primary-foreground" size={28} />
@@ -37,13 +69,11 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
         </div>
 
-        {/* Price */}
         <div className="mb-6">
           <span className="text-muted-foreground text-sm">Investment Price</span>
           <div className="text-4xl font-serif font-bold text-gradient-gold">₵{product.price}</div>
         </div>
 
-        {/* Math Breakdown */}
         <div className="bg-background/50 rounded-2xl p-5 mb-6 space-y-3 border border-gold/5">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">Daily Income</span>
@@ -68,9 +98,19 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
         </div>
 
-        {/* CTA */}
-        <button className="w-full py-4 rounded-2xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity">
-          Invest ₵{product.price} Now
+        <button
+          onClick={handlePayNow}
+          disabled={loading}
+          className="w-full py-4 rounded-2xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              Processing...
+            </>
+          ) : (
+            <>Pay ₵{product.price} Now</>
+          )}
         </button>
       </div>
     </div>
