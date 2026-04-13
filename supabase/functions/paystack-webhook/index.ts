@@ -6,6 +6,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-paystack-signature",
 };
 
+const REWARD_MAP: Record<number, number> = {
+  80: 15,
+  150: 20,
+  300: 30,
+  500: 40,
+  900: 45,
+};
+
+function getReward(amountInCedis: number): number {
+  return REWARD_MAP[amountInCedis] || 15;
+}
+
 async function verifySignature(
   body: string,
   signature: string,
@@ -44,12 +56,17 @@ Deno.serve(async (req) => {
 
     if (event.event === "charge.success") {
       const reference = event.data.reference;
+      const amountInPesewas = event.data.amount;
+      const amountInCedis = amountInPesewas / 100;
+      const productName = event.data.metadata?.product_name || "Investment";
+      const userId = event.data.metadata?.user_id;
 
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
 
+      // Update subscription
       const { error } = await supabase
         .from("premium_subscriptions")
         .update({ is_active: true, paid_at: new Date().toISOString() })
@@ -57,7 +74,75 @@ Deno.serve(async (req) => {
 
       if (error) {
         console.error("Failed to update subscription:", error);
-        return new Response("DB error", { status: 500 });
+      }
+
+      // Process referral reward
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("referred_by")
+          .eq("user_id", userId)
+          .single();
+
+        if (profile?.referred_by) {
+          const reward = getReward(amountInCedis);
+
+          // Check if referral already exists for this user
+          const { data: existingRef } = await supabase
+            .from("referrals")
+            .select("id, status")
+            .eq("referred_id", userId)
+            .single();
+
+          if (existingRef && existingRef.status === "pending") {
+            // Update the referral with product info and mark as paid
+            await supabase
+              .from("referrals")
+              .update({
+                product_name: productName,
+                reward_amount: reward,
+                status: "paid",
+              })
+              .eq("id", existingRef.id);
+
+            // Credit the referrer's balance
+            const { data: referrerProfile } = await supabase
+              .from("profiles")
+              .select("balance")
+              .eq("user_id", profile.referred_by)
+              .single();
+
+            if (referrerProfile) {
+              await supabase
+                .from("profiles")
+                .update({ balance: Number(referrerProfile.balance) + reward })
+                .eq("user_id", profile.referred_by);
+            }
+          } else if (!existingRef) {
+            // Create a new paid referral
+            await supabase.from("referrals").insert({
+              referrer_id: profile.referred_by,
+              referred_id: userId,
+              product_name: productName,
+              reward_amount: reward,
+              status: "paid",
+            });
+
+            // Credit the referrer's balance
+            const { data: referrerProfile } = await supabase
+              .from("profiles")
+              .select("balance")
+              .eq("user_id", profile.referred_by)
+              .single();
+
+            if (referrerProfile) {
+              await supabase
+                .from("profiles")
+                .update({ balance: Number(referrerProfile.balance) + reward })
+                .eq("user_id", profile.referred_by);
+            }
+          }
+        }
       }
     }
 

@@ -67,7 +67,15 @@ Deno.serve(async (req) => {
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
+            custom_fields: [
+              {
+                display_name: "Business Name",
+                variable_name: "business_name",
+                value: "LINDE GAS",
+              },
+            ],
           },
+          channels: ["card", "mobile_money"],
         }),
       }
     );

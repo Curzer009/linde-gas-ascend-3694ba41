@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingBag, Wallet, User, LogOut } from "lucide-react";
+import { Menu, X, ShoppingBag, Wallet, User, LogOut, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardNav = () => {
@@ -17,6 +17,7 @@ const DashboardNav = () => {
   const links = [
     { to: "/products", label: "Products", icon: ShoppingBag },
     { to: "/wallet", label: "Wallet", icon: Wallet },
+    { to: "/referrals", label: "Referrals", icon: Users },
     { to: "/profile", label: "Profile", icon: User },
   ];
 
