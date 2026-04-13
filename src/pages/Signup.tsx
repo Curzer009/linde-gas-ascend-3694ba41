@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -8,8 +8,25 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [referrerName, setReferrerName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get("ref") || "";
+
+  useEffect(() => {
+    if (!refCode) return;
+    // Look up referrer name
+    const lookup = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("referral_code", refCode)
+        .single();
+      if (data) setReferrerName(data.full_name);
+    };
+    lookup();
+  }, [refCode]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +40,9 @@ const Signup = () => {
     }
 
     setLoading(true);
-    // Use username as email placeholder for auth (username@lindegas.app)
     const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lindegas.app`;
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -37,9 +53,8 @@ const Signup = () => {
       },
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       if (error.message.includes("already registered")) {
         toast({ title: "This username is already taken. Try signing in.", variant: "destructive" });
       } else {
@@ -48,6 +63,36 @@ const Signup = () => {
       return;
     }
 
+    // Handle referral if ref code present
+    if (refCode && signUpData.user) {
+      try {
+        const { data: referrer } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("referral_code", refCode)
+          .single();
+
+        if (referrer) {
+          // Update the new user's referred_by field
+          await supabase
+            .from("profiles")
+            .update({ referred_by: referrer.user_id })
+            .eq("user_id", signUpData.user.id);
+
+          // Create a pending referral record
+          await supabase.from("referrals").insert({
+            referrer_id: referrer.user_id,
+            referred_id: signUpData.user.id,
+            reward_amount: 0,
+            status: "pending",
+          });
+        }
+      } catch (err) {
+        console.error("Referral tracking error:", err);
+      }
+    }
+
+    setLoading(false);
     toast({ title: "Account created successfully!" });
     navigate("/products");
   };
@@ -61,6 +106,9 @@ const Signup = () => {
           </div>
           <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Create Account</h1>
           <p className="text-muted-foreground">Join LINDE GAS and start earning today</p>
+          {referrerName && (
+            <p className="text-gold text-sm mt-2">Referred by: {referrerName}</p>
+          )}
         </div>
 
         <form onSubmit={handleSignup} className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">
