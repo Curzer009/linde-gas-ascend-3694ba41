@@ -64,18 +64,25 @@ Deno.serve(async (req) => {
           amount: amountInPesewas,
           currency: "GHS",
           reference,
+          label: "PAYMENT PAGE",
+          channels: ["card", "mobile_money"],
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
+            display_name: "PAYMENT PAGE",
             custom_fields: [
               {
                 display_name: "Business Name",
                 variable_name: "business_name",
                 value: "LINDE GAS",
               },
+              {
+                display_name: "Display Name",
+                variable_name: "display_name",
+                value: "PAYMENT PAGE",
+              },
             ],
           },
-          channels: ["card", "mobile_money"],
         }),
       }
     );
