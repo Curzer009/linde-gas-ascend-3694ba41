@@ -16,7 +16,6 @@ const Signup = () => {
 
   useEffect(() => {
     if (!refCode) return;
-    // Look up referrer name
     const lookup = async () => {
       const { data } = await supabase
         .from("profiles")
@@ -73,13 +72,11 @@ const Signup = () => {
           .single();
 
         if (referrer) {
-          // Update the new user's referred_by field
           await supabase
             .from("profiles")
             .update({ referred_by: referrer.user_id })
             .eq("user_id", signUpData.user.id);
 
-          // Create a pending referral record
           await supabase.from("referrals").insert({
             referrer_id: referrer.user_id,
             referred_id: signUpData.user.id,
@@ -87,8 +84,8 @@ const Signup = () => {
             status: "pending",
           });
         }
-      } catch (err) {
-        console.error("Referral tracking error:", err);
+      } catch {
+        // Referral tracking is non-critical
       }
     }
 
@@ -113,36 +110,45 @@ const Signup = () => {
 
         <form onSubmit={handleSignup} className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">Full Name</label>
+            <label htmlFor="signup-fullname" className="block text-sm font-medium text-muted-foreground mb-2">Full Name</label>
             <input
+              id="signup-fullname"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Enter your full name"
+              autoComplete="name"
+              maxLength={100}
               className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">Username</label>
+            <label htmlFor="signup-username" className="block text-sm font-medium text-muted-foreground mb-2">Username</label>
             <input
+              id="signup-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Choose a username"
+              autoComplete="username"
+              maxLength={50}
               className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">Password</label>
+            <label htmlFor="signup-password" className="block text-sm font-medium text-muted-foreground mb-2">Password</label>
             <input
+              id="signup-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a password"
+              autoComplete="new-password"
+              maxLength={128}
               className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               required
               minLength={6}

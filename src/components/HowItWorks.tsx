@@ -1,7 +1,7 @@
 import { ShoppingCart, Clock, Wallet, TrendingUp } from "lucide-react";
 
 const steps = [
-  { icon: ShoppingCart, title: "Choose a Product", desc: "Select from our premium range of investment products starting from $80." },
+  { icon: ShoppingCart, title: "Choose a Product", desc: "Select from our premium range of investment products starting from ₵80." },
   { icon: Wallet, title: "Make Your Investment", desc: "Securely invest in your chosen product and activate your income generation." },
   { icon: Clock, title: "Earn Daily Income", desc: "Receive consistent daily payouts throughout the 50-day generation period." },
   { icon: TrendingUp, title: "Collect 2× Returns", desc: "By day 50, you'll have earned double your initial investment — guaranteed." },
