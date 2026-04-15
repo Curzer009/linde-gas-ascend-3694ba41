@@ -1,23 +1,29 @@
-import { TrendingUp, Zap, Wind, Sun, Leaf, FlaskConical, Loader2 } from "lucide-react";
+import { TrendingUp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
+import massGasImg from "@/assets/product-mass-gas.jpg";
+import solarConvertorImg from "@/assets/product-solar-convertor.jpg";
+import oxygenTankImg from "@/assets/product-oxygen-tank.jpg";
+import npkCompoundsImg from "@/assets/product-npk-compounds.jpg";
+import extractedCompostImg from "@/assets/product-extracted-compost.jpg";
+
 interface Product {
   name: string;
   price: number;
-  icon: React.ElementType;
+  image: string;
   description: string;
   color: string;
 }
 
 const products: Product[] = [
-  { name: "MASS GAS", price: 80, icon: Wind, description: "Industrial-grade mass gas solution for energy production and manufacturing.", color: "from-blue-500/20 to-blue-600/5" },
-  { name: "SOLAR CONVERTOR", price: 150, icon: Sun, description: "High-efficiency solar conversion technology for sustainable energy generation.", color: "from-amber-500/20 to-amber-600/5" },
-  { name: "OXYGEN TANK", price: 300, icon: Zap, description: "Premium-grade compressed oxygen tanks for medical and industrial applications.", color: "from-cyan-500/20 to-cyan-600/5" },
-  { name: "NPK COMPOUNDS", price: 500, icon: FlaskConical, description: "Advanced nitrogen-phosphorus-potassium compounds for superior agricultural yield.", color: "from-emerald-500/20 to-emerald-600/5" },
-  { name: "EXTRACTED COMPOST", price: 900, icon: Leaf, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
+  { name: "MASS GAS", price: 80, image: massGasImg, description: "Industrial-grade mass gas solution for energy production and manufacturing.", color: "from-blue-500/20 to-blue-600/5" },
+  { name: "SOLAR CONVERTOR", price: 150, image: solarConvertorImg, description: "High-efficiency solar conversion technology for sustainable energy generation.", color: "from-amber-500/20 to-amber-600/5" },
+  { name: "OXYGEN TANK", price: 300, image: oxygenTankImg, description: "Premium-grade compressed oxygen tanks for medical and industrial applications.", color: "from-cyan-500/20 to-cyan-600/5" },
+  { name: "NPK COMPOUNDS", price: 500, image: npkCompoundsImg, description: "Advanced nitrogen-phosphorus-potassium compounds for superior agricultural yield.", color: "from-emerald-500/20 to-emerald-600/5" },
+  { name: "EXTRACTED COMPOST", price: 900, image: extractedCompostImg, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
 ];
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -56,18 +62,21 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div className="group relative bg-card rounded-3xl border border-gold/10 overflow-hidden hover:border-gold/30 transition-all duration-500 hover:glow-gold">
-      <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          width={640}
+          height={640}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+      </div>
       
-      <div className="relative p-8">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-gold flex items-center justify-center">
-            <product.icon className="text-primary-foreground" size={28} />
-          </div>
-          <div>
-            <h3 className="font-serif text-xl font-bold text-foreground">{product.name}</h3>
-            <p className="text-muted-foreground text-sm">{product.description}</p>
-          </div>
-        </div>
+      <div className="relative p-8 -mt-8">
+        <h3 className="font-serif text-xl font-bold text-foreground mb-1">{product.name}</h3>
+        <p className="text-muted-foreground text-sm mb-4">{product.description}</p>
 
         <div className="mb-6">
           <span className="text-muted-foreground text-sm">Investment Price</span>
