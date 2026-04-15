@@ -62,18 +62,21 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div className="group relative bg-card rounded-3xl border border-gold/10 overflow-hidden hover:border-gold/30 transition-all duration-500 hover:glow-gold">
-      <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          width={640}
+          height={640}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+      </div>
       
-      <div className="relative p-8">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-gold flex items-center justify-center">
-            <product.icon className="text-primary-foreground" size={28} />
-          </div>
-          <div>
-            <h3 className="font-serif text-xl font-bold text-foreground">{product.name}</h3>
-            <p className="text-muted-foreground text-sm">{product.description}</p>
-          </div>
-        </div>
+      <div className="relative p-8 -mt-8">
+        <h3 className="font-serif text-xl font-bold text-foreground mb-1">{product.name}</h3>
+        <p className="text-muted-foreground text-sm mb-4">{product.description}</p>
 
         <div className="mb-6">
           <span className="text-muted-foreground text-sm">Investment Price</span>
