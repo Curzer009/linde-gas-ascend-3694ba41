@@ -25,7 +25,9 @@ const Wallet = () => {
     }
   }, [user]);
 
-  const handleTransaction = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleTransaction = async () => {
     const val = parseFloat(amount);
     if (!val || val <= 0) {
       toast({ title: "Enter a valid amount", variant: "destructive" });
@@ -35,12 +37,27 @@ const Wallet = () => {
       toast({ title: "Insufficient balance", variant: "destructive" });
       return;
     }
-    toast({
-      title: activeTab === "deposit"
-        ? `Deposit request of ₵${val.toFixed(2)} submitted. Contact support to complete.`
-        : `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
-    });
-    setAmount("");
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-transaction", {
+        body: { amount: val, type: activeTab === "deposit" ? "deposit" : "withdrawal" },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: activeTab === "deposit"
+          ? `Deposit request of ₵${val.toFixed(2)} submitted. Contact support to complete.`
+          : `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
+      });
+      setAmount("");
+    } catch (err: any) {
+      toast({ title: "Request failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
