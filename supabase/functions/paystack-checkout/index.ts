@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
           currency: "GHS",
           reference,
           label: "PAYMENT PAGE",
-          channels: ["card", "mobile_money"],
+          channels: ["card", "mobile_money", "ussd"],
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
