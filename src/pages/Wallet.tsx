@@ -116,9 +116,10 @@ const Wallet = () => {
 
             <button
               onClick={handleTransaction}
-              className="w-full py-4 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity"
+              disabled={loading}
+              className="w-full py-4 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {activeTab === "deposit" ? "Request Deposit" : "Request Withdrawal"}
+              {loading ? "Processing..." : activeTab === "deposit" ? "Request Deposit" : "Request Withdrawal"}
             </button>
 
             <p className="text-muted-foreground text-xs text-center">
