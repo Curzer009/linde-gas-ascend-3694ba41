@@ -1,23 +1,29 @@
-import { TrendingUp, Zap, Wind, Sun, Leaf, FlaskConical, Loader2 } from "lucide-react";
+import { TrendingUp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
+import massGasImg from "@/assets/product-mass-gas.jpg";
+import solarConvertorImg from "@/assets/product-solar-convertor.jpg";
+import oxygenTankImg from "@/assets/product-oxygen-tank.jpg";
+import npkCompoundsImg from "@/assets/product-npk-compounds.jpg";
+import extractedCompostImg from "@/assets/product-extracted-compost.jpg";
+
 interface Product {
   name: string;
   price: number;
-  icon: React.ElementType;
+  image: string;
   description: string;
   color: string;
 }
 
 const products: Product[] = [
-  { name: "MASS GAS", price: 80, icon: Wind, description: "Industrial-grade mass gas solution for energy production and manufacturing.", color: "from-blue-500/20 to-blue-600/5" },
-  { name: "SOLAR CONVERTOR", price: 150, icon: Sun, description: "High-efficiency solar conversion technology for sustainable energy generation.", color: "from-amber-500/20 to-amber-600/5" },
-  { name: "OXYGEN TANK", price: 300, icon: Zap, description: "Premium-grade compressed oxygen tanks for medical and industrial applications.", color: "from-cyan-500/20 to-cyan-600/5" },
-  { name: "NPK COMPOUNDS", price: 500, icon: FlaskConical, description: "Advanced nitrogen-phosphorus-potassium compounds for superior agricultural yield.", color: "from-emerald-500/20 to-emerald-600/5" },
-  { name: "EXTRACTED COMPOST", price: 900, icon: Leaf, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
+  { name: "MASS GAS", price: 80, image: massGasImg, description: "Industrial-grade mass gas solution for energy production and manufacturing.", color: "from-blue-500/20 to-blue-600/5" },
+  { name: "SOLAR CONVERTOR", price: 150, image: solarConvertorImg, description: "High-efficiency solar conversion technology for sustainable energy generation.", color: "from-amber-500/20 to-amber-600/5" },
+  { name: "OXYGEN TANK", price: 300, image: oxygenTankImg, description: "Premium-grade compressed oxygen tanks for medical and industrial applications.", color: "from-cyan-500/20 to-cyan-600/5" },
+  { name: "NPK COMPOUNDS", price: 500, image: npkCompoundsImg, description: "Advanced nitrogen-phosphorus-potassium compounds for superior agricultural yield.", color: "from-emerald-500/20 to-emerald-600/5" },
+  { name: "EXTRACTED COMPOST", price: 900, image: extractedCompostImg, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
 ];
 
 const ProductCard = ({ product }: { product: Product }) => {
