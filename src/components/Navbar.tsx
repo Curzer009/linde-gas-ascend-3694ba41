@@ -1,9 +1,29 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAnchorClick = (hash: string) => {
+    setIsOpen(false);
+    if (location.pathname === "/") {
+      // Already on home, just scroll
+      const el = document.querySelector(hash);
+      el?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // Navigate to home then scroll
+      navigate("/" + hash);
+    }
+  };
+
+  const navItems = [
+    { label: "How It Works", hash: "#how-it-works" },
+    { label: "Reviews", hash: "#reviews" },
+    { label: "Contact", hash: "#contact" },
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-gold/10">
@@ -19,14 +39,14 @@ const Navbar = () => {
           <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-gold transition-colors duration-300">
             About Us
           </Link>
-          {["How It Works", "Reviews", "Contact"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="text-sm font-medium text-muted-foreground hover:text-gold transition-colors duration-300"
+          {navItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleAnchorClick(item.hash)}
+              className="text-sm font-medium text-muted-foreground hover:text-gold transition-colors duration-300 bg-transparent border-none cursor-pointer"
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
           <Link
             to="/signup"
@@ -46,15 +66,14 @@ const Navbar = () => {
           <Link to="/about" onClick={() => setIsOpen(false)} className="block text-sm font-medium text-muted-foreground hover:text-gold transition-colors">
             About Us
           </Link>
-          {["How It Works", "Reviews", "Contact"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-              onClick={() => setIsOpen(false)}
-              className="block text-sm font-medium text-muted-foreground hover:text-gold transition-colors"
+          {navItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleAnchorClick(item.hash)}
+              className="block text-sm font-medium text-muted-foreground hover:text-gold transition-colors bg-transparent border-none cursor-pointer text-left"
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
           <Link
             to="/signup"
