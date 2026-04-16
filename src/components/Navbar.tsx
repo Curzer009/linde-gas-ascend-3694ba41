@@ -16,6 +16,9 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
+          <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-gold transition-colors duration-300">
+            About Us
+          </Link>
           {["How It Works", "Reviews", "Contact"].map((item) => (
             <a
               key={item}
@@ -40,6 +43,9 @@ const Navbar = () => {
 
       {isOpen && (
         <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-gold/10 px-6 py-6 space-y-4">
+          <Link to="/about" onClick={() => setIsOpen(false)} className="block text-sm font-medium text-muted-foreground hover:text-gold transition-colors">
+            About Us
+          </Link>
           {["How It Works", "Reviews", "Contact"].map((item) => (
             <a
               key={item}
