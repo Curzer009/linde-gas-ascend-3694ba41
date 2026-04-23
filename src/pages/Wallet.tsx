@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Copy } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const AGENT_NUMBER = "0539013373";
+const AGENT_NAME = "Akwaa Owusu";
+const AGENT_PROVIDER = "MTN";
 
 const Wallet = () => {
   const { user } = useAuth();
@@ -11,6 +15,7 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
+  const [showDepositInfo, setShowDepositInfo] = useState(false);
 
   const fetchBalance = async () => {
     if (!user) return null;
@@ -30,36 +35,12 @@ const Wallet = () => {
     fetchBalance();
   }, [user]);
 
-  // Poll for balance updates after returning from Paystack
-  useEffect(() => {
-    if (!user) return;
-    const justPaid = sessionStorage.getItem("pendingDeposit");
-    if (!justPaid) return;
-
-    let cancelled = false;
-    let attempts = 0;
-    const previous = Number(justPaid);
-
-    const poll = async () => {
-      while (!cancelled && attempts < 15) {
-        attempts++;
-        const newBal = await fetchBalance();
-        if (newBal !== null && newBal > previous) {
-          sessionStorage.removeItem("pendingDeposit");
-          toast({ title: "Deposit credited!", description: `New balance: ₵${newBal.toFixed(2)}` });
-          return;
-        }
-        await new Promise((r) => setTimeout(r, 3000));
-      }
-      sessionStorage.removeItem("pendingDeposit");
-    };
-    poll();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
-
   const [loading, setLoading] = useState(false);
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: `${label} copied` });
+  };
 
   const handleTransaction = async () => {
     const val = parseFloat(amount);
@@ -75,16 +56,18 @@ const Wallet = () => {
     setLoading(true);
     try {
       if (activeTab === "deposit") {
-        const { data, error } = await supabase.functions.invoke("paystack-checkout", {
-          body: { amount: val, productName: "Wallet Deposit" },
+        const { data, error } = await supabase.functions.invoke("create-transaction", {
+          body: { amount: val, type: "deposit", notes: `MoMo to ${AGENT_NUMBER} (${AGENT_NAME})` },
         });
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
-        if (!data?.authorization_url) throw new Error("Payment URL not returned");
 
-        sessionStorage.setItem("pendingDeposit", String(balance));
-        toast({ title: "Redirecting to Paystack..." });
-        window.location.href = data.authorization_url;
+        setShowDepositInfo(true);
+        toast({
+          title: `Deposit request of ₵${val.toFixed(2)} created`,
+          description: "Send the amount to the agent below. Balance updates after admin confirms.",
+        });
+        setAmount("");
         return;
       }
 
