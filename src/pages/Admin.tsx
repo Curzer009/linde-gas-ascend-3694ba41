@@ -315,6 +315,14 @@ const Admin = () => {
             <TabsTrigger value="payments" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
               <CreditCard size={14} className="mr-1.5" /> Payments
             </TabsTrigger>
+            <TabsTrigger value="support" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
+              <MessageCircle size={14} className="mr-1.5" /> Support
+              {tickets.filter((t) => t.status === "open").length > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+                  {tickets.filter((t) => t.status === "open").length}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           {/* MEMBERS TAB */}
