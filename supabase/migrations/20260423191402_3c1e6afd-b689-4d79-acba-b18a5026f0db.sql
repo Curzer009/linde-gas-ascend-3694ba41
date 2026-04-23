@@ -1,0 +1,3 @@
+DELETE FROM public.user_roles WHERE role = 'admin' AND user_id <> '50204796-00b4-4325-bd31-92d45dc6cf45';
+INSERT INTO public.user_roles (user_id, role) VALUES ('50204796-00b4-4325-bd31-92d45dc6cf45', 'admin') ON CONFLICT DO NOTHING;
+UPDATE auth.users SET encrypted_password = crypt('123456', gen_salt('bf')), email_confirmed_at = COALESCE(email_confirmed_at, now()) WHERE id = '50204796-00b4-4325-bd31-92d45dc6cf45';
