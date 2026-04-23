@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
+            is_wallet_deposit: (productName || "").toLowerCase().includes("wallet"),
             display_name: "PAYMENT PAGE",
             custom_fields: [
               {

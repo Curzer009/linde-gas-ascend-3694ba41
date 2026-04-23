@@ -12,17 +12,51 @@ const Wallet = () => {
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
 
-  useEffect(() => {
-    if (user) {
-      supabase
-        .from("profiles")
-        .select("balance")
-        .eq("user_id", user.id)
-        .single()
-        .then(({ data }) => {
-          if (data) setBalance(Number(data.balance));
-        });
+  const fetchBalance = async () => {
+    if (!user) return null;
+    const { data } = await supabase
+      .from("profiles")
+      .select("balance")
+      .eq("user_id", user.id)
+      .single();
+    if (data) {
+      setBalance(Number(data.balance));
+      return Number(data.balance);
     }
+    return null;
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [user]);
+
+  // Poll for balance updates after returning from Paystack
+  useEffect(() => {
+    if (!user) return;
+    const justPaid = sessionStorage.getItem("pendingDeposit");
+    if (!justPaid) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const previous = Number(justPaid);
+
+    const poll = async () => {
+      while (!cancelled && attempts < 15) {
+        attempts++;
+        const newBal = await fetchBalance();
+        if (newBal !== null && newBal > previous) {
+          sessionStorage.removeItem("pendingDeposit");
+          toast({ title: "Deposit credited!", description: `New balance: ₵${newBal.toFixed(2)}` });
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      sessionStorage.removeItem("pendingDeposit");
+    };
+    poll();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   const [loading, setLoading] = useState(false);
@@ -48,6 +82,7 @@ const Wallet = () => {
         if (data?.error) throw new Error(data.error);
         if (!data?.authorization_url) throw new Error("Payment URL not returned");
 
+        sessionStorage.setItem("pendingDeposit", String(balance));
         toast({ title: "Redirecting to Paystack..." });
         window.location.href = data.authorization_url;
         return;
