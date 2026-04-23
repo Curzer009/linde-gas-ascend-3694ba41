@@ -134,7 +134,7 @@ const Wallet = () => {
 
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "Contact our WhatsApp support to complete your deposit."
+                ? "You'll be redirected to Paystack to pay securely via Card, Mobile Money, or USSD."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
