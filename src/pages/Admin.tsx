@@ -552,6 +552,68 @@ const Admin = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* SUPPORT TAB */}
+          <TabsContent value="support">
+            <Card className="border-gold/10 bg-card">
+              <CardHeader>
+                <CardTitle className="text-foreground">Support Tickets ({tickets.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gold/10">
+                      <TableHead>Member</TableHead>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>Message</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tickets.map((t) => (
+                      <TableRow key={t.id} className="border-gold/5">
+                        <TableCell className="text-muted-foreground text-xs">{getMemberName(t.user_id)}</TableCell>
+                        <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
+                        <TableCell className="text-muted-foreground text-xs max-w-xs truncate">{t.message}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                            t.status === "answered" ? "bg-green-500/20 text-green-400"
+                              : t.status === "closed" ? "bg-muted text-muted-foreground"
+                              : "bg-gold/20 text-gold"
+                          }`}>
+                            {t.status}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {new Date(t.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-gold/20 hover:bg-gold/10"
+                            onClick={() => {
+                              setReplyTicket(t);
+                              setReplyText(t.admin_reply || "");
+                            }}
+                          >
+                            {t.admin_reply ? "View / Edit" : "Reply"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {tickets.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No support tickets yet</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
