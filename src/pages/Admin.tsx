@@ -734,6 +734,33 @@ const Admin = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* SUPPORT REPLY DIALOG */}
+      <Dialog open={!!replyTicket} onOpenChange={() => { setReplyTicket(null); setReplyText(""); }}>
+        <DialogContent className="bg-card border-gold/10 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Reply to: {replyTicket?.subject}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="bg-background/60 rounded-lg p-3 border border-gold/10">
+              <p className="text-muted-foreground text-xs mb-1">From {replyTicket && getMemberName(replyTicket.user_id)}</p>
+              <p className="text-foreground text-sm">{replyTicket?.message}</p>
+            </div>
+            <Textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Type your reply..."
+              rows={5}
+              maxLength={2000}
+              className="bg-secondary border-gold/10"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setReplyTicket(null); setReplyText(""); }} className="border-gold/20">Cancel</Button>
+            <Button className="bg-gradient-gold text-primary-foreground" onClick={submitReply}>Send Reply</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
