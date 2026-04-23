@@ -52,6 +52,17 @@ interface PaymentMethod {
   is_active: boolean;
 }
 
+interface SupportTicket {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  admin_reply: string | null;
+  status: string;
+  created_at: string;
+  replied_at: string | null;
+}
+
 const Admin = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -61,6 +72,9 @@ const Admin = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [replyTicket, setReplyTicket] = useState<SupportTicket | null>(null);
+  const [replyText, setReplyText] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Edit dialogs
@@ -75,16 +89,38 @@ const Admin = () => {
   }, []);
 
   const fetchAll = async () => {
-    const [m, t, p, pm] = await Promise.all([
+    const [m, t, p, pm, st] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("transactions").select("*").order("created_at", { ascending: false }),
       supabase.from("products").select("*").order("price", { ascending: true }),
       supabase.from("payment_methods").select("*").order("name"),
+      supabase.from("support_tickets").select("*").order("created_at", { ascending: false }),
     ]);
     if (m.data) setMembers(m.data);
     if (t.data) setTransactions(t.data);
     if (p.data) setProducts(p.data);
     if (pm.data) setPaymentMethods(pm.data);
+    if (st.data) setTickets(st.data as SupportTicket[]);
+  };
+
+  const submitReply = async () => {
+    if (!replyTicket || !replyText.trim()) return;
+    const { error } = await supabase
+      .from("support_tickets")
+      .update({
+        admin_reply: replyText.trim().slice(0, 2000),
+        status: "answered",
+        replied_at: new Date().toISOString(),
+      })
+      .eq("id", replyTicket.id);
+    if (error) {
+      toast({ title: "Reply failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Reply sent" });
+    setReplyTicket(null);
+    setReplyText("");
+    fetchAll();
   };
 
   const handleSignOut = async () => {
