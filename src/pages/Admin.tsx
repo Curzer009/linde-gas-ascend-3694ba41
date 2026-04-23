@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search } from "lucide-react";
+import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search, MessageCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Profile {
   id: string;
@@ -51,6 +52,17 @@ interface PaymentMethod {
   is_active: boolean;
 }
 
+interface SupportTicket {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  admin_reply: string | null;
+  status: string;
+  created_at: string;
+  replied_at: string | null;
+}
+
 const Admin = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -60,6 +72,9 @@ const Admin = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [replyTicket, setReplyTicket] = useState<SupportTicket | null>(null);
+  const [replyText, setReplyText] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Edit dialogs
@@ -74,16 +89,38 @@ const Admin = () => {
   }, []);
 
   const fetchAll = async () => {
-    const [m, t, p, pm] = await Promise.all([
+    const [m, t, p, pm, st] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("transactions").select("*").order("created_at", { ascending: false }),
       supabase.from("products").select("*").order("price", { ascending: true }),
       supabase.from("payment_methods").select("*").order("name"),
+      supabase.from("support_tickets").select("*").order("created_at", { ascending: false }),
     ]);
     if (m.data) setMembers(m.data);
     if (t.data) setTransactions(t.data);
     if (p.data) setProducts(p.data);
     if (pm.data) setPaymentMethods(pm.data);
+    if (st.data) setTickets(st.data as SupportTicket[]);
+  };
+
+  const submitReply = async () => {
+    if (!replyTicket || !replyText.trim()) return;
+    const { error } = await supabase
+      .from("support_tickets")
+      .update({
+        admin_reply: replyText.trim().slice(0, 2000),
+        status: "answered",
+        replied_at: new Date().toISOString(),
+      })
+      .eq("id", replyTicket.id);
+    if (error) {
+      toast({ title: "Reply failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Reply sent" });
+    setReplyTicket(null);
+    setReplyText("");
+    fetchAll();
   };
 
   const handleSignOut = async () => {
@@ -277,6 +314,14 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
               <CreditCard size={14} className="mr-1.5" /> Payments
+            </TabsTrigger>
+            <TabsTrigger value="support" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
+              <MessageCircle size={14} className="mr-1.5" /> Support
+              {tickets.filter((t) => t.status === "open").length > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
+                  {tickets.filter((t) => t.status === "open").length}
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -507,6 +552,68 @@ const Admin = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* SUPPORT TAB */}
+          <TabsContent value="support">
+            <Card className="border-gold/10 bg-card">
+              <CardHeader>
+                <CardTitle className="text-foreground">Support Tickets ({tickets.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gold/10">
+                      <TableHead>Member</TableHead>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>Message</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tickets.map((t) => (
+                      <TableRow key={t.id} className="border-gold/5">
+                        <TableCell className="text-muted-foreground text-xs">{getMemberName(t.user_id)}</TableCell>
+                        <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
+                        <TableCell className="text-muted-foreground text-xs max-w-xs truncate">{t.message}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                            t.status === "answered" ? "bg-green-500/20 text-green-400"
+                              : t.status === "closed" ? "bg-muted text-muted-foreground"
+                              : "bg-gold/20 text-gold"
+                          }`}>
+                            {t.status}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {new Date(t.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-gold/20 hover:bg-gold/10"
+                            onClick={() => {
+                              setReplyTicket(t);
+                              setReplyText(t.admin_reply || "");
+                            }}
+                          >
+                            {t.admin_reply ? "View / Edit" : "Reply"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {tickets.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No support tickets yet</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -624,6 +731,33 @@ const Admin = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setNewPayment(false)} className="border-gold/20">Cancel</Button>
             <Button className="bg-gradient-gold text-primary-foreground" onClick={addPaymentMethod}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* SUPPORT REPLY DIALOG */}
+      <Dialog open={!!replyTicket} onOpenChange={() => { setReplyTicket(null); setReplyText(""); }}>
+        <DialogContent className="bg-card border-gold/10 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Reply to: {replyTicket?.subject}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="bg-background/60 rounded-lg p-3 border border-gold/10">
+              <p className="text-muted-foreground text-xs mb-1">From {replyTicket && getMemberName(replyTicket.user_id)}</p>
+              <p className="text-foreground text-sm">{replyTicket?.message}</p>
+            </div>
+            <Textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Type your reply..."
+              rows={5}
+              maxLength={2000}
+              className="bg-secondary border-gold/10"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setReplyTicket(null); setReplyText(""); }} className="border-gold/20">Cancel</Button>
+            <Button className="bg-gradient-gold text-primary-foreground" onClick={submitReply}>Send Reply</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

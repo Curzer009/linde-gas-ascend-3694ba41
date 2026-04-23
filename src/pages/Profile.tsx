@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Mail, Calendar, MessageCircle } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
+import SupportBot from "@/components/SupportBot";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -79,20 +80,20 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Contact */}
-          <div className="bg-card rounded-3xl border border-gold/10 p-8">
-            <h3 className="font-serif text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <MessageCircle className="text-gold" size={20} /> Contact Support
+          {/* Support Bot */}
+          <div>
+            <h3 className="font-serif text-lg font-bold text-foreground mb-3 flex items-center gap-2 px-1">
+              <MessageCircle className="text-gold" size={20} /> Support
             </h3>
+            <SupportBot variant="inline" />
             <a
               href="https://whatsapp.com/channel/0029Vb7fjyr4dTnDmhjmml2x"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-3 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-center hover:opacity-90 transition-opacity"
+              className="block w-full mt-4 py-3 rounded-xl border border-gold/20 text-foreground font-semibold text-center hover:bg-gold/5 transition-colors"
             >
-              Chat on WhatsApp
+              Or chat on WhatsApp
             </a>
-            <p className="text-muted-foreground text-xs text-center mt-2">Available 24/7</p>
           </div>
         </div>
       </div>

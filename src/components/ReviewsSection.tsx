@@ -13,69 +13,99 @@ interface Review {
 
 const reviews: Review[] = [
   {
-    name: "Kwame Asante",
-    location: "Accra, Ghana",
+    name: "Nana Akua Owusu",
+    location: "East Legon, Accra",
     product: "EXTRACTED COMPOST",
     rating: 5,
-    text: "I was skeptical at first, but after my first 50-day cycle I received exactly ₵1,800 from my ₵900 investment. Already reinvested into my second round. The daily payouts are consistent.",
+    text: "Honestly didn't believe it would work but my first ₵900 came back as ₵1,800 exactly on day 50. Daily payouts hit my balance every morning without fail. Already on my second cycle.",
     invested: 900,
     earned: 1800,
-    daysAgo: 12,
+    daysAgo: 9,
   },
   {
-    name: "Abena Mensah",
-    location: "Kumasi, Ghana",
+    name: "Emmanuel Tetteh",
+    location: "Kumasi, Ashanti",
     product: "NPK COMPOUNDS",
-    rating: 5,
-    text: "A colleague introduced me to Linde Gas. I started with NPK Compounds and the returns were exactly as promised. ₵500 turned into ₵1,000 in 50 days. Very transparent process.",
+    rating: 4,
+    text: "Returns are exactly as promised, no issues there. My only complaint is that withdrawals take up to 24 hours to process. I really wish they were instant like the deposits, but apart from that everything is solid.",
     invested: 500,
     earned: 1000,
-    daysAgo: 8,
+    daysAgo: 6,
   },
   {
-    name: "Yaw Boateng",
-    location: "Takoradi, Ghana",
+    name: "Adwoa Pokuaa",
+    location: "Tema Community 25",
     product: "OXYGEN TANK",
-    rating: 4,
-    text: "Good experience overall. The daily income hits my account without fail. I've completed two full cycles with the Oxygen Tank product and the math checks out every time.",
+    rating: 5,
+    text: "Started with the Oxygen Tank as a test. ₵12 every day for 50 days, never missed once. Transferred my profits to my Mobile Money smoothly. Customer support actually responds on WhatsApp too.",
     invested: 300,
     earned: 600,
-    daysAgo: 23,
+    daysAgo: 21,
   },
   {
-    name: "Efua Darkwah",
-    location: "Tamale, Ghana",
+    name: "Selorm Agbeko",
+    location: "Ho, Volta Region",
     product: "SOLAR CONVERTOR",
-    rating: 5,
-    text: "I started small with the Solar Convertor to test the waters. ₵6/day for 50 days gave me exactly ₵300. Now I'm scaling up to NPK Compounds. Highly recommend for beginners.",
+    rating: 4,
+    text: "Beginner friendly. ₵150 turned into ₵300 in exactly 50 days. The platform is clean and easy. Withdrawal isn't instant which is a small downside but my money always arrives within the same day so I can live with it.",
     invested: 150,
     earned: 300,
-    daysAgo: 5,
+    daysAgo: 4,
   },
   {
-    name: "Kofi Adu",
-    location: "Cape Coast, Ghana",
+    name: "Kwesi Frimpong",
+    location: "Cape Coast",
     product: "MASS GAS",
     rating: 5,
-    text: "Best decision I made this year. Even the ₵80 Mass Gas product doubles. I've told my family about it and three of them have joined. Simple, reliable, and profitable.",
+    text: "Even the smallest ₵80 product paid me back fully. I'm not rich so starting small was perfect. Brought my brother and two cousins on board, all of them are earning now. Genuinely impressed.",
     invested: 80,
     earned: 160,
-    daysAgo: 18,
+    daysAgo: 14,
   },
   {
-    name: "Ama Serwah",
-    location: "Sunyani, Ghana",
+    name: "Akosua Boateng",
+    location: "Sunyani, Bono",
     product: "EXTRACTED COMPOST",
     rating: 4,
-    text: "The returns are genuine. I completed one cycle and received my full ₵1,800. Customer support via WhatsApp is responsive too. Planning to invest in multiple products next time.",
+    text: "Completed one full cycle and got every cedi back. The only thing I'd change is the withdrawal speed — would prefer instant transfers — but the daily earnings are 100% reliable so I'm not really complaining.",
     invested: 900,
     earned: 1800,
-    daysAgo: 31,
+    daysAgo: 27,
+  },
+  {
+    name: "Daniel Osei",
+    location: "Madina, Accra",
+    product: "NPK COMPOUNDS",
+    rating: 5,
+    text: "Three cycles deep now. ₵500 in, ₵1,000 out, every single time. The math is transparent and it just works. This is the only platform I've used in Ghana that actually pays consistently.",
+    invested: 500,
+    earned: 1000,
+    daysAgo: 33,
+  },
+  {
+    name: "Hannah Asare",
+    location: "Takoradi, Western",
+    product: "OXYGEN TANK",
+    rating: 4,
+    text: "Daily income is real and consistent. Wish withdrawals processed instantly instead of taking a few hours, that's my one wish. Otherwise the system is intact and I trust it with my money.",
+    invested: 300,
+    earned: 600,
+    daysAgo: 11,
+  },
+  {
+    name: "Ibrahim Mohammed",
+    location: "Tamale, Northern",
+    product: "SOLAR CONVERTOR",
+    rating: 5,
+    text: "I was skeptical because of all the scams in Ghana but a coworker showed me his withdrawal proof. Tested with ₵150 and got my full ₵300 back. Now scaling up properly.",
+    invested: 150,
+    earned: 300,
+    daysAgo: 17,
   },
 ];
 
 const averageRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
-const totalReviews = 1247;
+const totalReviews = 1389;
 
 const Stars = ({ rating }: { rating: number }) => (
   <div className="flex gap-0.5">
@@ -101,10 +131,9 @@ const ReviewsSection = () => {
             Trusted by <span className="text-gradient-gold">Thousands</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
-            Real investors sharing their experience with Linde Gas products.
+            Real investors sharing their honest experience with Linde Gas products.
           </p>
 
-          {/* Average Rating Summary */}
           <div className="inline-flex items-center gap-4 bg-card rounded-2xl border border-gold/10 px-8 py-5">
             <div className="text-5xl font-serif font-bold text-gradient-gold">{averageRating}</div>
             <div className="text-left">

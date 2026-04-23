@@ -40,17 +40,27 @@ const Wallet = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-transaction", {
-        body: { amount: val, type: activeTab === "deposit" ? "deposit" : "withdrawal" },
-      });
+      if (activeTab === "deposit") {
+        const { data, error } = await supabase.functions.invoke("paystack-checkout", {
+          body: { amount: val, productName: "Wallet Deposit" },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        if (!data?.authorization_url) throw new Error("Payment URL not returned");
 
+        toast({ title: "Redirecting to Paystack..." });
+        window.location.href = data.authorization_url;
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-transaction", {
+        body: { amount: val, type: "withdrawal" },
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
       toast({
-        title: activeTab === "deposit"
-          ? `Deposit request of ₵${val.toFixed(2)} submitted. Contact support to complete.`
-          : `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
+        title: `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
       });
       setAmount("");
     } catch (err: any) {
@@ -124,7 +134,7 @@ const Wallet = () => {
 
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "Contact our WhatsApp support to complete your deposit."
+                ? "You'll be redirected to Paystack to pay securely via Card, Mobile Money, or USSD."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
