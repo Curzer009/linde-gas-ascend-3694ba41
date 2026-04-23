@@ -66,6 +66,12 @@ Deno.serve(async (req) => {
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
 
+      const isWalletDeposit =
+        event.data.metadata?.is_wallet_deposit === true ||
+        String(event.data.metadata?.product_name || "")
+          .toLowerCase()
+          .includes("wallet");
+
       // Update subscription
       const { error } = await supabase
         .from("premium_subscriptions")
@@ -74,6 +80,42 @@ Deno.serve(async (req) => {
 
       if (error) {
         console.error("Failed to update subscription:", error);
+      }
+
+      // Credit wallet for deposits (idempotent via reference)
+      if (isWalletDeposit && userId) {
+        const { data: existingTxn } = await supabase
+          .from("transactions")
+          .select("id")
+          .eq("reference", reference)
+          .maybeSingle();
+
+        if (!existingTxn) {
+          const { error: txnErr } = await supabase.from("transactions").insert({
+            user_id: userId,
+            amount: amountInCedis,
+            type: "deposit",
+            status: "completed",
+            reference,
+            notes: "Paystack deposit",
+          });
+
+          if (txnErr) {
+            console.error("Failed to log deposit txn:", txnErr);
+          } else {
+            const { data: depProfile } = await supabase
+              .from("profiles")
+              .select("balance")
+              .eq("user_id", userId)
+              .single();
+            if (depProfile) {
+              await supabase
+                .from("profiles")
+                .update({ balance: Number(depProfile.balance) + amountInCedis })
+                .eq("user_id", userId);
+            }
+          }
+        }
       }
 
       // Process referral reward
