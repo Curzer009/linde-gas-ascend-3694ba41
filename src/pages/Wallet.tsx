@@ -152,10 +152,52 @@ const Wallet = () => {
 
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "Pay securely via Mobile Money or USSD. Approval is done from your phone — no SMS OTP needed. Need help? Reach us on WhatsApp."
+                ? "Send your deposit via Mobile Money to the agent details shown below. Your balance updates once the admin confirms payment."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
+
+          {activeTab === "deposit" && (
+            <>
+              <div className="mt-6 bg-card rounded-3xl border border-gold/20 p-6 space-y-4">
+                <h3 className="font-serif text-lg font-bold text-gradient-gold text-center">
+                  Send Mobile Money To
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-background border border-gold/10">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Agent Number</p>
+                      <p className="text-foreground font-bold tracking-wider">{AGENT_NUMBER}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(AGENT_NUMBER, "Number")}
+                      className="p-2 rounded-lg hover:bg-gold/10 text-gold transition-colors"
+                      aria-label="Copy number"
+                    >
+                      <Copy size={18} />
+                    </button>
+                  </div>
+                  <div className="p-3 rounded-xl bg-background border border-gold/10">
+                    <p className="text-xs text-muted-foreground">Account Name</p>
+                    <p className="text-foreground font-semibold">{AGENT_NAME}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-background border border-gold/10">
+                    <p className="text-xs text-muted-foreground">Network</p>
+                    <p className="text-foreground font-semibold">{AGENT_PROVIDER}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-center pt-2">
+                  After sending, click <span className="text-gold font-semibold">Request Deposit</span> above so the admin can confirm and credit your wallet.
+                </p>
+              </div>
+
+              <div className="mt-4 p-4 rounded-2xl border border-destructive/30 bg-destructive/5">
+                <p className="text-destructive text-xs text-center font-medium">
+                  ⚠ Telecel transactions are currently down and will be updated soon.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
