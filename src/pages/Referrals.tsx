@@ -67,7 +67,7 @@ const Referrals = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <DashboardNav />
       <div className="pt-24 pb-16 container mx-auto px-6 max-w-4xl">
         <div className="text-center mb-10">

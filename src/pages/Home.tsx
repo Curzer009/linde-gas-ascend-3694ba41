@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <HeroSection />
       <HowItWorks />
