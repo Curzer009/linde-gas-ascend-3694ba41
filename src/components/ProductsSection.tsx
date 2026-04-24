@@ -140,6 +140,19 @@ const ProductCard = ({ product, balance, onPurchased }: { product: Product; bala
 };
 
 const ProductsSection = () => {
+  const { user } = useAuth();
+  const [balance, setBalance] = useState(0);
+
+  const fetchBalance = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("profiles").select("balance").eq("user_id", user.id).single();
+    if (data) setBalance(Number(data.balance));
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [user]);
+
   return (
     <section id="products" className="py-24 relative">
       <div className="container mx-auto px-6">
@@ -153,11 +166,16 @@ const ProductsSection = () => {
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Each product generates 2× its value over a 50-day period with guaranteed daily returns.
           </p>
+          {user && (
+            <p className="text-foreground mt-4 text-sm">
+              Wallet Balance: <span className="text-gold font-bold">₵{balance.toFixed(2)}</span>
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
-            <ProductCard key={product.name} product={product} />
+            <ProductCard key={product.name} product={product} balance={balance} onPurchased={fetchBalance} />
           ))}
         </div>
       </div>
