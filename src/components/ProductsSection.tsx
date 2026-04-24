@@ -1,5 +1,6 @@
 import { TrendingUp, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -26,39 +27,49 @@ const products: Product[] = [
   { name: "EXTRACTED COMPOST", price: 900, image: extractedCompostImg, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
 ];
 
-const ProductCard = ({ product }: { product: Product }) => {
+const ProductCard = ({ product, balance, onPurchased }: { product: Product; balance: number; onPurchased: () => void }) => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const totalReturn = product.price * 2;
   const dailyIncome = totalReturn / 50;
   const totalProfit = totalReturn - product.price;
 
-  const handlePayNow = async () => {
+  const handleBuy = async () => {
     if (!user) {
       toast({ title: "Please log in first", variant: "destructive" });
+      return;
+    }
+    if (balance < product.price) {
+      toast({
+        title: "Insufficient balance",
+        description: `You need ₵${product.price.toFixed(2)}. Recharge your wallet to continue.`,
+        variant: "destructive",
+      });
+      navigate("/wallet");
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("paystack-checkout", {
-        body: { amount: product.price, productName: product.name },
+      const { data, error } = await supabase.functions.invoke("create-transaction", {
+        body: { amount: product.price, type: "purchase", notes: product.name },
       });
-
       if (error) throw error;
-      if (data?.authorization_url) {
-        window.location.href = data.authorization_url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
+      if (data?.error) throw new Error(data.error);
+
+      toast({ title: `Purchased ${product.name}`, description: `₵${product.price} deducted from your balance.` });
+      onPurchased();
     } catch (err: any) {
-      toast({ title: "Payment failed", description: err.message, variant: "destructive" });
+      toast({ title: "Purchase failed", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
+  const insufficient = balance < product.price;
 
   return (
     <div className="group relative bg-card rounded-3xl border border-gold/10 overflow-hidden hover:border-gold/30 transition-all duration-500 hover:glow-gold">
@@ -108,7 +119,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
 
         <button
-          onClick={handlePayNow}
+          onClick={handleBuy}
           disabled={loading}
           className="w-full py-4 rounded-2xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
@@ -117,8 +128,10 @@ const ProductCard = ({ product }: { product: Product }) => {
               <Loader2 className="animate-spin" size={20} />
               Processing...
             </>
+          ) : insufficient ? (
+            <>Recharge to Buy</>
           ) : (
-            <>Pay ₵{product.price} Now</>
+            <>Buy with Balance · ₵{product.price}</>
           )}
         </button>
       </div>
@@ -127,6 +140,19 @@ const ProductCard = ({ product }: { product: Product }) => {
 };
 
 const ProductsSection = () => {
+  const { user } = useAuth();
+  const [balance, setBalance] = useState(0);
+
+  const fetchBalance = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("profiles").select("balance").eq("user_id", user.id).single();
+    if (data) setBalance(Number(data.balance));
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [user]);
+
   return (
     <section id="products" className="py-24 relative">
       <div className="container mx-auto px-6">
@@ -140,11 +166,16 @@ const ProductsSection = () => {
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Each product generates 2× its value over a 50-day period with guaranteed daily returns.
           </p>
+          {user && (
+            <p className="text-foreground mt-4 text-sm">
+              Wallet Balance: <span className="text-gold font-bold">₵{balance.toFixed(2)}</span>
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
-            <ProductCard key={product.name} product={product} />
+            <ProductCard key={product.name} product={product} balance={balance} onPurchased={fetchBalance} />
           ))}
         </div>
       </div>

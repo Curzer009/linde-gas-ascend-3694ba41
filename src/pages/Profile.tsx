@@ -23,7 +23,7 @@ const Profile = () => {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <DashboardNav />
       <div className="pt-24 pb-16 container mx-auto px-6">
         <div className="text-center mb-12">

@@ -4,7 +4,7 @@ import DashboardNav from "@/components/DashboardNav";
 
 const Products = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <DashboardNav />
       <div className="pt-20">
         <ProductsSection />

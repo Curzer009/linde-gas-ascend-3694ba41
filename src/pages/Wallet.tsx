@@ -81,7 +81,7 @@ const Wallet = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <DashboardNav />
       <div className="pt-24 pb-16 container mx-auto px-6">
         <div className="text-center mb-12">
@@ -141,7 +141,7 @@ const Wallet = () => {
               {loading
                 ? "Processing..."
                 : activeTab === "deposit"
-                ? "Pay with Paystack"
+                ? "Recharge"
                 : "Request Withdrawal"}
             </button>
             <p className="text-muted-foreground text-xs text-center">
