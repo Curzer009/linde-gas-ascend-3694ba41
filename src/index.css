@@ -68,7 +68,7 @@
     font-family: 'Inter', sans-serif;
     background-image:
       linear-gradient(hsl(var(--background) / 0.88), hsl(var(--background) / 0.92)),
-      url('/src/assets/page-bg.png');
+      url('/page-bg.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
