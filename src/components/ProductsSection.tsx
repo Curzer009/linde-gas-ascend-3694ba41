@@ -1,5 +1,6 @@
 import { TrendingUp, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -26,39 +27,49 @@ const products: Product[] = [
   { name: "EXTRACTED COMPOST", price: 900, image: extractedCompostImg, description: "Biologically enriched compost extract for maximum soil fertility and growth.", color: "from-green-500/20 to-green-600/5" },
 ];
 
-const ProductCard = ({ product }: { product: Product }) => {
+const ProductCard = ({ product, balance, onPurchased }: { product: Product; balance: number; onPurchased: () => void }) => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const totalReturn = product.price * 2;
   const dailyIncome = totalReturn / 50;
   const totalProfit = totalReturn - product.price;
 
-  const handlePayNow = async () => {
+  const handleBuy = async () => {
     if (!user) {
       toast({ title: "Please log in first", variant: "destructive" });
+      return;
+    }
+    if (balance < product.price) {
+      toast({
+        title: "Insufficient balance",
+        description: `You need ₵${product.price.toFixed(2)}. Recharge your wallet to continue.`,
+        variant: "destructive",
+      });
+      navigate("/wallet");
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("paystack-checkout", {
-        body: { amount: product.price, productName: product.name },
+      const { data, error } = await supabase.functions.invoke("create-transaction", {
+        body: { amount: product.price, type: "purchase", notes: product.name },
       });
-
       if (error) throw error;
-      if (data?.authorization_url) {
-        window.location.href = data.authorization_url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
+      if (data?.error) throw new Error(data.error);
+
+      toast({ title: `Purchased ${product.name}`, description: `₵${product.price} deducted from your balance.` });
+      onPurchased();
     } catch (err: any) {
-      toast({ title: "Payment failed", description: err.message, variant: "destructive" });
+      toast({ title: "Purchase failed", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
+  const insufficient = balance < product.price;
 
   return (
     <div className="group relative bg-card rounded-3xl border border-gold/10 overflow-hidden hover:border-gold/30 transition-all duration-500 hover:glow-gold">
@@ -108,7 +119,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
 
         <button
-          onClick={handlePayNow}
+          onClick={handleBuy}
           disabled={loading}
           className="w-full py-4 rounded-2xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
@@ -117,8 +128,10 @@ const ProductCard = ({ product }: { product: Product }) => {
               <Loader2 className="animate-spin" size={20} />
               Processing...
             </>
+          ) : insufficient ? (
+            <>Recharge to Buy</>
           ) : (
-            <>Pay ₵{product.price} Now</>
+            <>Buy with Balance · ₵{product.price}</>
           )}
         </button>
       </div>
