@@ -141,7 +141,7 @@ const Wallet = () => {
               {loading
                 ? "Processing..."
                 : activeTab === "deposit"
-                ? "Pay with Paystack"
+                ? "Recharge"
                 : "Request Withdrawal"}
             </button>
             <p className="text-muted-foreground text-xs text-center">
