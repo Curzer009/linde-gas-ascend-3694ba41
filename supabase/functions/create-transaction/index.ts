@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const { amount, type, notes } = await req.json();
 
     // Validate type
-    if (!["deposit", "withdrawal"].includes(type)) {
+    if (!["deposit", "withdrawal", "purchase"].includes(type)) {
       return new Response(
         JSON.stringify({ error: "Invalid transaction type" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -56,12 +56,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For withdrawals, check balance server-side
-    if (type === "withdrawal") {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-      );
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // For withdrawals & purchases, check balance server-side
+    if (type === "withdrawal" || type === "purchase") {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
         .select("balance")
@@ -74,19 +75,28 @@ Deno.serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-    }
 
-    // Insert transaction with server-controlled status
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+      // For purchases, deduct balance immediately
+      if (type === "purchase") {
+        const newBalance = Number(profile.balance) - parsedAmount;
+        const { error: updErr } = await supabaseAdmin
+          .from("profiles")
+          .update({ balance: newBalance })
+          .eq("user_id", user.id);
+        if (updErr) {
+          return new Response(JSON.stringify({ error: updErr.message }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
 
     const { data, error } = await supabaseAdmin.from("transactions").insert({
       user_id: user.id,
       amount: parsedAmount,
       type,
-      status: "pending",
+      status: type === "purchase" ? "completed" : "pending",
       notes: notes ? String(notes).slice(0, 500) : null,
       reference: `txn_${user.id.slice(0, 8)}_${Date.now()}`,
     }).select().single();
