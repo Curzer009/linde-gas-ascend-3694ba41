@@ -87,12 +87,12 @@ const Profile = () => {
             </h3>
             <SupportBot variant="inline" />
             <a
-              href="https://whatsapp.com/channel/0029Vb7fjyr4dTnDmhjmml2x"
+              href="https://t.me/lendgassupport"
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full mt-4 py-3 rounded-xl border border-gold/20 text-foreground font-semibold text-center hover:bg-gold/5 transition-colors"
             >
-              Or chat on WhatsApp
+              Or contact us @lendgassupport on Telegram
             </a>
           </div>
         </div>
