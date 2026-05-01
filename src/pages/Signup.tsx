@@ -39,7 +39,7 @@ const Signup = () => {
     }
 
     setLoading(true);
-    const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lindegas.app`;
+    const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
 
     const { data: signUpData, error } = await supabase.auth.signUp({
       email,
