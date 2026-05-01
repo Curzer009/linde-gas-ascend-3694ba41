@@ -40,7 +40,10 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gold/10 pt-8 text-center">
+        <div className="border-t border-gold/10 pt-8 text-center space-y-2">
+          <a href="/terms" className="text-sm text-muted-foreground hover:text-gold transition-colors">
+            Terms and Conditions
+          </a>
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} LEND GAS. All rights reserved.
           </p>
