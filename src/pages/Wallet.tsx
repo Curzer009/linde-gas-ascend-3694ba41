@@ -50,10 +50,16 @@ const Wallet = () => {
     }
   };
 
+  const MIN_WITHDRAWAL = 20;
+
   const handleWithdraw = async () => {
     const val = parseFloat(amount);
     if (!val || val <= 0) {
       toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    if (val < MIN_WITHDRAWAL) {
+      toast({ title: `Minimum withdrawal is ₵${MIN_WITHDRAWAL}`, variant: "destructive" });
       return;
     }
     if (val > balance) {
@@ -144,9 +150,15 @@ const Wallet = () => {
                 ? "Recharge"
                 : "Request Withdrawal"}
             </button>
+            {activeTab === "withdraw" && (
+              <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-xs text-foreground/80 space-y-1">
+                <p><span className="font-semibold text-gold">Minimum withdrawal:</span> ₵{MIN_WITHDRAWAL}.00</p>
+                <p>A 15% processing fee applies. Requests are reviewed within 24–72 hours (excluding weekends &amp; public holidays).</p>
+              </div>
+            )}
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "You'll be redirected to Paystack to complete payment via Mobile Money or USSD."
+                ? "You'll be redirected to the LEND GAS payment page to complete payment via Mobile Money."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
