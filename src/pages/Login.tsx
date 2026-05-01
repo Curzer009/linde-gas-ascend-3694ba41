@@ -41,7 +41,7 @@ const Login = () => {
             <span className="text-primary-foreground font-serif font-bold text-2xl">L</span>
           </div>
           <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground">Sign in to your LINDE GAS account</p>
+          <p className="text-muted-foreground">Sign in to your LEND GAS account</p>
         </div>
 
         <form onSubmit={handleLogin} className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">

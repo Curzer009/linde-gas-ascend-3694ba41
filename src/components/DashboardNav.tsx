@@ -30,7 +30,7 @@ const DashboardNav = () => {
           <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center">
             <span className="text-primary-foreground font-serif font-bold text-lg">L</span>
           </div>
-          <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
+          <span className="font-serif text-xl font-bold text-gradient-gold">LEND GAS</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
