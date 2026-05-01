@@ -97,31 +97,27 @@ const SupportBot = ({ variant = "floating" }: SupportBotProps) => {
       </div>
 
       <div className="p-5 space-y-4 max-h-[420px] overflow-y-auto">
-        {tickets.length === 0 ? (
+        {tickets.length === 0 || !tickets.some((t) => t.admin_reply) ? (
           <div className="text-center py-6 text-muted-foreground text-sm">
             <Bot className="mx-auto mb-2 text-gold" size={32} />
-            Send your first report below. Our admin will respond directly here.
+            Send your report below. Our support bot will respond directly here.
           </div>
         ) : (
-          tickets.map((t) => (
-            <div key={t.id} className="space-y-2">
-              <div className="bg-background/60 rounded-2xl rounded-tl-sm p-3 border border-gold/10">
-                <p className="text-foreground font-semibold text-sm">{t.subject}</p>
-                <p className="text-muted-foreground text-xs mt-1">{t.message}</p>
-                <p className="text-muted-foreground/60 text-[10px] mt-2">
-                  {new Date(t.created_at).toLocaleString()}
-                </p>
-              </div>
-              {t.admin_reply ? (
-                <div className="bg-gold/10 rounded-2xl rounded-tr-sm p-3 border border-gold/20 ml-6">
-                  <p className="text-gold font-semibold text-xs mb-1">Admin reply</p>
+          tickets
+            .filter((t) => t.admin_reply)
+            .map((t) => (
+              <div key={t.id} className="space-y-2">
+                <div className="bg-gold/10 rounded-2xl rounded-tl-sm p-3 border border-gold/20">
+                  <p className="text-gold font-semibold text-xs mb-1 flex items-center gap-1">
+                    <Bot size={12} /> Bot reply
+                  </p>
                   <p className="text-foreground text-sm">{t.admin_reply}</p>
+                  <p className="text-muted-foreground/60 text-[10px] mt-2">
+                    Re: {t.subject}
+                  </p>
                 </div>
-              ) : (
-                <p className="text-muted-foreground text-xs ml-6 italic">Waiting for admin reply…</p>
-              )}
-            </div>
-          ))
+              </div>
+            ))
         )}
       </div>
 
