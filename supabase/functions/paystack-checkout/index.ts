@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
               {
                 display_name: "Business Name",
                 variable_name: "business_name",
-                value: "LINDE GAS",
+                value: "LEND GAS",
               },
               {
                 display_name: "Display Name",

@@ -102,7 +102,7 @@ const Signup = () => {
             <span className="text-primary-foreground font-serif font-bold text-2xl">L</span>
           </div>
           <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Join LINDE GAS and start earning today</p>
+          <p className="text-muted-foreground">Join LEND GAS and start earning today</p>
           {referrerName && (
             <p className="text-gold text-sm mt-2">Referred by: {referrerName}</p>
           )}

@@ -19,7 +19,7 @@ const HowItWorks = () => {
             How It <span className="text-gradient-gold">Works</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Four simple steps to start generating income with LINDE GAS.
+            Four simple steps to start generating income with LEND GAS.
           </p>
         </div>
 

@@ -8,7 +8,7 @@ const Footer = () => {
               <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center">
                 <span className="text-primary-foreground font-serif font-bold text-lg">L</span>
               </div>
-              <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
+              <span className="font-serif text-xl font-bold text-gradient-gold">LEND GAS</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Premium industrial products with guaranteed 2× returns over a 50-day generation period.
@@ -42,7 +42,7 @@ const Footer = () => {
 
         <div className="border-t border-gold/10 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} LINDE GAS. All rights reserved.
+            © {new Date().getFullYear()} LEND GAS. All rights reserved.
           </p>
         </div>
       </div>
