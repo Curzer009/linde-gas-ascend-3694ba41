@@ -280,6 +280,26 @@ const Admin = () => {
       </nav>
 
       <div className="pt-24 pb-12 container mx-auto px-6">
+        {/* Admin Account */}
+        {adminProfile && (
+          <Card className="border-gold/30 bg-card mb-6">
+            <CardContent className="p-5 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
+                <Shield className="text-primary-foreground" size={26} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gold font-semibold uppercase tracking-wider">Signed in as Administrator</p>
+                <h2 className="font-serif text-xl font-bold text-foreground">{adminProfile.full_name}</h2>
+                <p className="text-sm text-muted-foreground">@{adminProfile.username} · {user?.email}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Balance</p>
+                <p className="text-gold font-bold text-lg">₵{Number(adminProfile.balance || 0).toFixed(2)}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="border-gold/10 bg-card">
