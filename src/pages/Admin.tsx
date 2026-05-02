@@ -63,6 +63,57 @@ interface SupportTicket {
   replied_at: string | null;
 }
 
+const PasswordResetTool = ({ members, toast, adminId }: { members: Profile[]; toast: any; adminId?: string }) => {
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const send = async () => {
+    if (!selectedUserId) {
+      toast({ title: "Select a user", variant: "destructive" });
+      return;
+    }
+    const target = members.find((m) => m.user_id === selectedUserId);
+    if (!target) return;
+    const email = `${target.username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
+    setSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (!error && adminId) {
+      await supabase.from("admin_audit_log").insert({
+        admin_id: adminId,
+        action: "send_password_reset",
+        target_user_id: selectedUserId,
+        details: { username: target.username },
+      });
+    }
+    setSending(false);
+    if (error) {
+      toast({ title: "Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `Reset link sent for @${target.username}` });
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <select
+        value={selectedUserId}
+        onChange={(e) => setSelectedUserId(e.target.value)}
+        className="flex-1 px-3 py-2 rounded-lg bg-background border border-gold/10 text-sm text-foreground focus:outline-none focus:border-gold/30"
+      >
+        <option value="">Select user...</option>
+        {members.map((m) => (
+          <option key={m.user_id} value={m.user_id}>@{m.username} — {m.full_name}</option>
+        ))}
+      </select>
+      <Button onClick={send} disabled={sending || !selectedUserId} className="bg-gradient-gold text-primary-foreground hover:opacity-90">
+        <Mail size={14} className="mr-1.5" /> {sending ? "Sending..." : "Send Reset"}
+      </Button>
+    </div>
+  );
+};
+
 const Admin = () => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
