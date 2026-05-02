@@ -64,9 +64,21 @@ interface SupportTicket {
 }
 
 const Admin = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => { if (data) setAdminProfile(data as Profile); });
+  }, [user]);
+
 
   const [members, setMembers] = useState<Profile[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
