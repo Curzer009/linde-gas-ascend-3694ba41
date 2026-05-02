@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingBag, Wallet, User, LogOut, Users } from "lucide-react";
+import { Menu, X, ShoppingBag, Wallet, User, LogOut, Users, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardNav = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { signOut, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const check = async () => {
+      if (!user) { setIsAdmin(false); return; }
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      setIsAdmin(!!data);
+    };
+    check();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -19,6 +30,7 @@ const DashboardNav = () => {
     { to: "/wallet", label: "Wallet", icon: Wallet },
     { to: "/referrals", label: "Referrals", icon: Users },
     { to: "/profile", label: "Profile", icon: User },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
