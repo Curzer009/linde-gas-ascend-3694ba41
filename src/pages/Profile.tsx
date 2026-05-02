@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { User, Mail, Calendar, MessageCircle } from "lucide-react";
+import { User, Mail, Calendar } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
-import SupportBot from "@/components/SupportBot";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -80,21 +79,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Support Bot */}
-          <div>
-            <h3 className="font-serif text-lg font-bold text-foreground mb-3 flex items-center gap-2 px-1">
-              <MessageCircle className="text-gold" size={20} /> Support
-            </h3>
-            <SupportBot variant="inline" />
-            <a
-              href="https://t.me/lendgassupport"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full mt-4 py-3 rounded-xl border border-gold/20 text-foreground font-semibold text-center hover:bg-gold/5 transition-colors"
-            >
-              Or contact us @lendgassupport on Telegram
-            </a>
-          </div>
         </div>
       </div>
     </div>
