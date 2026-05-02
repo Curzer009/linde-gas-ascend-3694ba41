@@ -282,23 +282,61 @@ const Admin = () => {
       <div className="pt-24 pb-12 container mx-auto px-6">
         {/* Admin Account */}
         {adminProfile && (
-          <Card className="border-gold/30 bg-card mb-6">
-            <CardContent className="p-5 flex flex-col md:flex-row md:items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
-                <Shield className="text-primary-foreground" size={26} />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gold font-semibold uppercase tracking-wider">Signed in as Administrator</p>
-                <h2 className="font-serif text-xl font-bold text-foreground">{adminProfile.full_name}</h2>
-                <p className="text-sm text-muted-foreground">@{adminProfile.username} · {user?.email}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Balance</p>
-                <p className="text-gold font-bold text-lg">₵{Number(adminProfile.balance || 0).toFixed(2)}</p>
+          <Card className="border-gold/30 bg-gradient-to-br from-card to-card/50 mb-6 overflow-hidden">
+            <div className="h-1 bg-gradient-gold" />
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center gap-5">
+                <div className="w-16 h-16 rounded-full bg-gradient-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
+                  <Shield className="text-primary-foreground" size={28} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded-full bg-gold/15 text-gold text-[10px] font-bold uppercase tracking-wider">Administrator</span>
+                    <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-500 text-[10px] font-bold uppercase tracking-wider">Active</span>
+                  </div>
+                  <h2 className="font-serif text-2xl font-bold text-foreground">{adminProfile.full_name}</h2>
+                  <p className="text-sm text-muted-foreground">@{adminProfile.username} · {user?.email}</p>
+                </div>
+                <div className="grid grid-cols-3 md:flex md:gap-6 gap-3 text-center md:text-right">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Members</p>
+                    <p className="text-foreground font-bold">{members.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Open Tickets</p>
+                    <p className="text-foreground font-bold">{tickets.filter((t) => t.status === "open").length}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Balance</p>
+                    <p className="text-gold font-bold">₵{Number(adminProfile.balance || 0).toFixed(2)}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         )}
+
+        {/* Admin Actions */}
+        <Card className="border-gold/10 bg-card mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-foreground text-base flex items-center gap-2">
+              <KeyRound size={16} className="text-gold" /> Admin Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-gold/5 border border-gold/10">
+              <AlertTriangle size={16} className="text-gold mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Passwords are stored as one-way hashes and cannot be viewed by anyone — including admins.
+                To help a user regain access, send them a one-time reset link below.
+              </p>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-2 block">Send password reset link to user</label>
+              <PasswordResetTool members={members} toast={toast} adminId={user?.id} />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
