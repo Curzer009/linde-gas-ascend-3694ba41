@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search, MessageCircle } from "lucide-react";
+import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search, MessageCircle, Mail, KeyRound, AlertTriangle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,6 +62,57 @@ interface SupportTicket {
   created_at: string;
   replied_at: string | null;
 }
+
+const PasswordResetTool = ({ members, toast, adminId }: { members: Profile[]; toast: any; adminId?: string }) => {
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const send = async () => {
+    if (!selectedUserId) {
+      toast({ title: "Select a user", variant: "destructive" });
+      return;
+    }
+    const target = members.find((m) => m.user_id === selectedUserId);
+    if (!target) return;
+    const email = `${target.username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
+    setSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (!error && adminId) {
+      await supabase.from("admin_audit_log").insert({
+        admin_id: adminId,
+        action: "send_password_reset",
+        target_user_id: selectedUserId,
+        details: { username: target.username },
+      });
+    }
+    setSending(false);
+    if (error) {
+      toast({ title: "Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `Reset link sent for @${target.username}` });
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <select
+        value={selectedUserId}
+        onChange={(e) => setSelectedUserId(e.target.value)}
+        className="flex-1 px-3 py-2 rounded-lg bg-background border border-gold/10 text-sm text-foreground focus:outline-none focus:border-gold/30"
+      >
+        <option value="">Select user...</option>
+        {members.map((m) => (
+          <option key={m.user_id} value={m.user_id}>@{m.username} — {m.full_name}</option>
+        ))}
+      </select>
+      <Button onClick={send} disabled={sending || !selectedUserId} className="bg-gradient-gold text-primary-foreground hover:opacity-90">
+        <Mail size={14} className="mr-1.5" /> {sending ? "Sending..." : "Send Reset"}
+      </Button>
+    </div>
+  );
+};
 
 const Admin = () => {
   const { signOut, user } = useAuth();
@@ -282,23 +333,61 @@ const Admin = () => {
       <div className="pt-24 pb-12 container mx-auto px-6">
         {/* Admin Account */}
         {adminProfile && (
-          <Card className="border-gold/30 bg-card mb-6">
-            <CardContent className="p-5 flex flex-col md:flex-row md:items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
-                <Shield className="text-primary-foreground" size={26} />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gold font-semibold uppercase tracking-wider">Signed in as Administrator</p>
-                <h2 className="font-serif text-xl font-bold text-foreground">{adminProfile.full_name}</h2>
-                <p className="text-sm text-muted-foreground">@{adminProfile.username} · {user?.email}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Balance</p>
-                <p className="text-gold font-bold text-lg">₵{Number(adminProfile.balance || 0).toFixed(2)}</p>
+          <Card className="border-gold/30 bg-gradient-to-br from-card to-card/50 mb-6 overflow-hidden">
+            <div className="h-1 bg-gradient-gold" />
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center gap-5">
+                <div className="w-16 h-16 rounded-full bg-gradient-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
+                  <Shield className="text-primary-foreground" size={28} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded-full bg-gold/15 text-gold text-[10px] font-bold uppercase tracking-wider">Administrator</span>
+                    <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-500 text-[10px] font-bold uppercase tracking-wider">Active</span>
+                  </div>
+                  <h2 className="font-serif text-2xl font-bold text-foreground">{adminProfile.full_name}</h2>
+                  <p className="text-sm text-muted-foreground">@{adminProfile.username} · {user?.email}</p>
+                </div>
+                <div className="grid grid-cols-3 md:flex md:gap-6 gap-3 text-center md:text-right">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Members</p>
+                    <p className="text-foreground font-bold">{members.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Open Tickets</p>
+                    <p className="text-foreground font-bold">{tickets.filter((t) => t.status === "open").length}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Balance</p>
+                    <p className="text-gold font-bold">₵{Number(adminProfile.balance || 0).toFixed(2)}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         )}
+
+        {/* Admin Actions */}
+        <Card className="border-gold/10 bg-card mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-foreground text-base flex items-center gap-2">
+              <KeyRound size={16} className="text-gold" /> Admin Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-gold/5 border border-gold/10">
+              <AlertTriangle size={16} className="text-gold mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Passwords are stored as one-way hashes and cannot be viewed by anyone — including admins.
+                To help a user regain access, send them a one-time reset link below.
+              </p>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-2 block">Send password reset link to user</label>
+              <PasswordResetTool members={members} toast={toast} adminId={user?.id} />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           created_at: string
@@ -117,6 +144,7 @@ export type Database = {
           full_name: string
           id: string
           is_suspended: boolean
+          phone: string | null
           referral_code: string | null
           referred_by: string | null
           updated_at: string
@@ -129,6 +157,7 @@ export type Database = {
           full_name: string
           id?: string
           is_suspended?: boolean
+          phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
           updated_at?: string
@@ -141,6 +170,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_suspended?: boolean
+          phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
           updated_at?: string
