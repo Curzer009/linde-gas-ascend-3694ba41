@@ -19,14 +19,11 @@ const ForgotPassword = () => {
     }
     setLoading(true);
 
-    // If the user typed an email, use it directly. Otherwise treat as username.
-    let email = value;
-    if (!value.includes("@")) {
-      email = `${value.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
-    }
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const { error } = await supabase.functions.invoke("username-password-reset", {
+      body: {
+        identifier: value,
+        redirectTo: `${window.location.origin}/reset-password`,
+      },
     });
     setLoading(false);
 
