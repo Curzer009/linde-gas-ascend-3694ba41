@@ -55,7 +55,10 @@ const Profile = () => {
       return;
     }
     setSavingEmail(true);
-    const { error } = await supabase.auth.updateUser({ email: cleaned });
+    const { error } = await supabase.auth.updateUser(
+      { email: cleaned },
+      { emailRedirectTo: `${window.location.origin}/profile` }
+    );
     setSavingEmail(false);
     if (error) {
       toast({ title: "Failed", description: error.message, variant: "destructive" });
