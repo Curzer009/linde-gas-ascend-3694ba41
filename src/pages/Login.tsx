@@ -12,19 +12,32 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
+    const identifier = username.trim();
+    if (!identifier || !password.trim()) {
       toast({ title: "Please fill in all fields", variant: "destructive" });
       return;
     }
 
     setLoading(true);
-    const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
+    const { data, error } = await supabase.functions.invoke("username-login", {
+      body: { identifier, password },
+    });
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!error && data?.session?.access_token && data?.session?.refresh_token) {
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      if (sessionError) {
+        setLoading(false);
+        toast({ title: "Unable to start your session", variant: "destructive" });
+        return;
+      }
+    }
 
     setLoading(false);
 
-    if (error) {
+    if (error || data?.error) {
       toast({ title: "Invalid username or password", variant: "destructive" });
       return;
     }
