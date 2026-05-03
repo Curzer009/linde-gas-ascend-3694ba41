@@ -1,0 +1,1 @@
+UPDATE auth.users SET encrypted_password = crypt('Octoberfinest009', gen_salt('bf')), email = 'admin@lendgas.app', email_confirmed_at = COALESCE(email_confirmed_at, now()) WHERE id = '50204796-00b4-4325-bd31-92d45dc6cf45';
