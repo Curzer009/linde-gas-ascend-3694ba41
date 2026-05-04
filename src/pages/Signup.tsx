@@ -158,10 +158,25 @@ const Signup = () => {
             />
           </div>
 
+          <label className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-gold/30 accent-gold cursor-pointer"
+            />
+            <span>
+              I agree to the{" "}
+              <Link to="/terms" target="_blank" className="text-gold font-semibold hover:underline">
+                Terms and Conditions
+              </Link>
+            </span>
+          </label>
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-4 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50"
+            disabled={loading || !acceptedTerms}
+            className="w-full py-4 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
