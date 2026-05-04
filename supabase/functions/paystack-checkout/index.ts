@@ -51,6 +51,13 @@ Deno.serve(async (req) => {
     const reference = `ps_${userId}_${Date.now()}`;
     const amountInPesewas = Math.round(amount * 100);
 
+    // Determine callback URL from request origin so Paystack redirects back to /wallet
+    const origin =
+      req.headers.get("origin") ||
+      req.headers.get("referer")?.replace(/\/+$/, "") ||
+      "";
+    const callbackUrl = origin ? `${origin}/wallet` : undefined;
+
     const paystackRes = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {
@@ -66,6 +73,7 @@ Deno.serve(async (req) => {
           reference,
           label: "LINDE GAS",
           channels: ["mobile_money"],
+          ...(callbackUrl ? { callback_url: callbackUrl } : {}),
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
