@@ -31,8 +31,13 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !username.trim() || !password.trim()) {
+    if (!fullName.trim() || !username.trim() || !phone.trim() || !password.trim()) {
       toast({ title: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+    const normalizedPhone = phone.trim().replace(/[^\d+]/g, "");
+    if (normalizedPhone.replace(/\D/g, "").length < 7) {
+      toast({ title: "Please enter a valid phone number", variant: "destructive" });
       return;
     }
     if (password.length < 6) {
@@ -54,6 +59,7 @@ const Signup = () => {
         data: {
           full_name: fullName,
           username: username,
+          phone: normalizedPhone,
         },
       },
     });
