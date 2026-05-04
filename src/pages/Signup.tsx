@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
