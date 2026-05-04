@@ -5,8 +5,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/page-bg.png" alt="LEND GAS logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
-              <span className="font-serif text-xl font-bold text-gradient-gold">LEND GAS</span>
+              <img src="/page-bg.png" alt="LINDE GAS logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
+              <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Premium industrial products with guaranteed 2× returns over a 50-day generation period.
@@ -27,12 +27,12 @@ const Footer = () => {
           <div>
             <h4 className="font-serif text-lg font-bold text-foreground mb-4">Contact Us</h4>
             <a
-              href="https://t.me/lendgassupport"
+              href="https://t.me/lindegassupport"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-gold hover:text-gold/80 transition-colors text-sm font-semibold"
             >
-              Contact us @lendgassupport on Telegram
+              Contact us @lindegassupport on Telegram
             </a>
             <p className="text-muted-foreground text-sm mt-1">Available 24/7</p>
           </div>
@@ -43,7 +43,7 @@ const Footer = () => {
             Terms and Conditions
           </a>
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} LEND GAS. All rights reserved.
+            © {new Date().getFullYear()} LINDE GAS. All rights reserved.
           </p>
         </div>
       </div>

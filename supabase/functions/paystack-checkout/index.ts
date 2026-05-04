@@ -64,23 +64,23 @@ Deno.serve(async (req) => {
           amount: amountInPesewas,
           currency: "GHS",
           reference,
-          label: "LEND GAS",
+          label: "LINDE GAS",
           channels: ["mobile_money"],
           metadata: {
             user_id: userId,
             product_name: productName || "Investment",
             is_wallet_deposit: (productName || "").toLowerCase().includes("wallet"),
-            display_name: "LEND GAS",
+            display_name: "LINDE GAS",
             custom_fields: [
               {
                 display_name: "Business Name",
                 variable_name: "business_name",
-                value: "LEND GAS",
+                value: "LINDE GAS",
               },
               {
                 display_name: "Display Name",
                 variable_name: "display_name",
-                value: "LEND GAS",
+                value: "LINDE GAS",
               },
             ],
           },

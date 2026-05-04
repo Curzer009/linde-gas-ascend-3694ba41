@@ -7,7 +7,7 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <img
         src={heroBg}
-        alt="LEND GAS premium background"
+        alt="LINDE GAS premium background"
         className="absolute inset-0 w-full h-full object-cover"
         width={1920}
         height={1080}
@@ -27,7 +27,7 @@ const HeroSection = () => {
         </h1>
 
         <p className="animate-fade-up-delay-2 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-          Acquire premium industrial products and earn <span className="text-gold font-semibold">2× returns</span> over a 50-day generation period. Guaranteed daily income, powered by LEND GAS.
+          Acquire premium industrial products and earn <span className="text-gold font-semibold">2× returns</span> over a 50-day generation period. Guaranteed daily income, powered by LINDE GAS.
         </p>
 
         <div className="animate-fade-up-delay-2 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
