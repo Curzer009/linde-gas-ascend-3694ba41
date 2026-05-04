@@ -44,20 +44,35 @@ Deno.serve(async (req) => {
     let email = rawIdentifier.toLowerCase();
 
     if (!isEmail(rawIdentifier)) {
-      const username = normalizeUsername(rawIdentifier);
-      if (!username) return json({ error: "Invalid username or password" }, 400);
+      let userId: string | null = null;
 
-      const { data: profile, error: profileError } = await admin
-        .from("profiles")
-        .select("user_id")
-        .eq("username", username)
-        .maybeSingle();
-
-      if (profileError || !profile?.user_id) {
-        return json({ error: "Invalid username or password" }, 400);
+      if (isPhone(rawIdentifier)) {
+        const phone = normalizePhone(rawIdentifier);
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("user_id")
+          .eq("phone", phone)
+          .maybeSingle();
+        if (profile?.user_id) userId = profile.user_id;
       }
 
-      const { data: userData, error: userError } = await admin.auth.admin.getUserById(profile.user_id);
+      if (!userId) {
+        const username = normalizeUsername(rawIdentifier);
+        if (!username) return json({ error: "Invalid username or password" }, 400);
+
+        const { data: profile, error: profileError } = await admin
+          .from("profiles")
+          .select("user_id")
+          .eq("username", username)
+          .maybeSingle();
+
+        if (profileError || !profile?.user_id) {
+          return json({ error: "Invalid username or password" }, 400);
+        }
+        userId = profile.user_id;
+      }
+
+      const { data: userData, error: userError } = await admin.auth.admin.getUserById(userId);
       if (userError || !userData.user?.email) {
         return json({ error: "Invalid username or password" }, 400);
       }
