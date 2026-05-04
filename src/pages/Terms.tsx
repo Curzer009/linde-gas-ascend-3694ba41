@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-const SITE = "[LEND GAS]";
+const SITE = "[LINDE GAS]";
 const LAST_UPDATED = "May 1, 2026";
 
 const sections = [

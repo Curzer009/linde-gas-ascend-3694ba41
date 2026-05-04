@@ -27,7 +27,7 @@ const Profile = () => {
             setPhone(data.phone || "");
           }
         });
-      setEmail(user.email && !user.email.endsWith("@lendgas.app") ? user.email : "");
+      setEmail(user.email && !user.email.endsWith("@lindegas.app") ? user.email : "");
     }
   }, [user]);
 
@@ -67,7 +67,7 @@ const Profile = () => {
     }
   };
 
-  const hasRealEmail = user?.email && !user.email.endsWith("@lendgas.app");
+  const hasRealEmail = user?.email && !user.email.endsWith("@lindegas.app");
 
   return (
     <div className="min-h-screen bg-transparent">

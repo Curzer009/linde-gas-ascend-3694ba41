@@ -16,17 +16,17 @@ const sections = [
   {
     icon: Heart,
     title: "Community Engagement",
-    text: "Community is a corporate value at LEND. Connecting with the communities where we live and work and fostering resilience are key priorities for us. Through charitable contributions, volunteering, and strategic investments, our people live our mission of making our world more productive every day.",
+    text: "Community is a corporate value at LINDE. Connecting with the communities where we live and work and fostering resilience are key priorities for us. Through charitable contributions, volunteering, and strategic investments, our people live our mission of making our world more productive every day.",
   },
   {
     icon: Users,
-    title: "Inclusion at LEND",
-    text: "With operations in more than 80 countries — diversity isn't something that LEND does, it's simply who we are. Our employees around the globe each bring their diverse backgrounds, skills and experiences and help foster a collaborative, innovative and performance-driven workplace. At LEND, inclusion is a core value — we strive to provide an environment where individuals of all backgrounds feel comfortable bringing their ideas to the table.",
+    title: "Inclusion at LINDE",
+    text: "With operations in more than 80 countries — diversity isn't something that LINDE does, it's simply who we are. Our employees around the globe each bring their diverse backgrounds, skills and experiences and help foster a collaborative, innovative and performance-driven workplace. At LINDE, inclusion is a core value — we strive to provide an environment where individuals of all backgrounds feel comfortable bringing their ideas to the table.",
   },
   {
     icon: Scale,
     title: "Guided by Integrity",
-    text: "Integrity is one of our core values. It is at the heart of everything we do and say at LEND. Ethical, respectful, fair, and compliant behaviors build transparency and trust, creating a solid basis for growth and prosperity to the benefit of our employees, customers, suppliers, markets and communities.",
+    text: "Integrity is one of our core values. It is at the heart of everything we do and say at LINDE. Ethical, respectful, fair, and compliant behaviors build transparency and trust, creating a solid basis for growth and prosperity to the benefit of our employees, customers, suppliers, markets and communities.",
   },
   {
     icon: Link2,
@@ -41,7 +41,7 @@ const sections = [
   {
     icon: Shield,
     title: "Sustainability in Focus",
-    text: "At LEND, we are actively engaged in efforts to reduce our own footprint as part of our commitment to protect our planet for the long term. We deliver on our commitment through concrete measures focused around Climate Change, Safety, Health and Environment, People and Community, and Integrity and Compliance.",
+    text: "At LINDE, we are actively engaged in efforts to reduce our own footprint as part of our commitment to protect our planet for the long term. We deliver on our commitment through concrete measures focused around Climate Change, Safety, Health and Environment, People and Community, and Integrity and Compliance.",
   },
 ];
 
@@ -57,10 +57,10 @@ const About = () => {
             About Us
           </span>
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Why <span className="text-gradient-gold">LEND GAS</span>
+            Why <span className="text-gradient-gold">LINDE GAS</span>
           </h1>
           <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-            LEND is a leading global industrial gases and engineering company with 2024 sales of $33 billion. We live our mission of making our world more productive every day by providing high-quality solutions, technologies and services. Our industrial gases and technologies are used in countless applications including production of clean hydrogen, life-saving medical oxygen and high-purity & specialty gases for electronics. For over 50 years, LEND has been a global leader in hydrogen and is leveraging its engineering capabilities to make cleaner energy a reality worldwide.
+            LINDE is a leading global industrial gases and engineering company with 2024 sales of $33 billion. We live our mission of making our world more productive every day by providing high-quality solutions, technologies and services. Our industrial gases and technologies are used in countless applications including production of clean hydrogen, life-saving medical oxygen and high-purity & specialty gases for electronics. For over 50 years, LINDE has been a global leader in hydrogen and is leveraging its engineering capabilities to make cleaner energy a reality worldwide.
           </p>
         </div>
       </section>

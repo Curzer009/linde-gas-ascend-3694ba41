@@ -29,8 +29,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-gold/10">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/page-bg.png" alt="LEND GAS logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
-          <span className="font-serif text-xl font-bold text-gradient-gold">LEND GAS</span>
+          <img src="/page-bg.png" alt="LINDE GAS logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
+          <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

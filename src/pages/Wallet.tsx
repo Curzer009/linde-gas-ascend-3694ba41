@@ -158,7 +158,7 @@ const Wallet = () => {
             )}
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "You'll be redirected to the LEND GAS payment page to complete payment via Mobile Money."
+                ? "You'll be redirected to the LINDE GAS payment page to complete payment via Mobile Money."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>

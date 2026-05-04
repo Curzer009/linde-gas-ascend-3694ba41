@@ -74,7 +74,7 @@ const PasswordResetTool = ({ members, toast, adminId }: { members: Profile[]; to
     }
     const target = members.find((m) => m.user_id === selectedUserId);
     if (!target) return;
-    const email = `${target.username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lendgas.app`;
+    const email = `${target.username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lindegas.app`;
     setSending(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,

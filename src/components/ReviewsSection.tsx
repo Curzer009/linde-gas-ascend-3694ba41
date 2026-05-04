@@ -131,7 +131,7 @@ const ReviewsSection = () => {
             Trusted by <span className="text-gradient-gold">Thousands</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
-            Real investors sharing their honest experience with LEND GAS products.
+            Real investors sharing their honest experience with LINDE GAS products.
           </p>
 
           <div className="inline-flex items-center gap-4 bg-card rounded-2xl border border-gold/10 px-8 py-5">
