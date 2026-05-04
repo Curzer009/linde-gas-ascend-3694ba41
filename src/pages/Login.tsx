@@ -57,13 +57,13 @@ const Login = () => {
 
         <form onSubmit={handleLogin} className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">
           <div>
-            <label htmlFor="login-username" className="block text-sm font-medium text-muted-foreground mb-2">Username</label>
+            <label htmlFor="login-username" className="block text-sm font-medium text-muted-foreground mb-2">Username or Phone Number</label>
             <input
               id="login-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder="Enter your username or phone number"
               autoComplete="username"
               maxLength={50}
               className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"

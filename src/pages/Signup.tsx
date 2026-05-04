@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -30,8 +31,13 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !username.trim() || !password.trim()) {
+    if (!fullName.trim() || !username.trim() || !phone.trim() || !password.trim()) {
       toast({ title: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+    const normalizedPhone = phone.trim().replace(/[^\d+]/g, "");
+    if (normalizedPhone.replace(/\D/g, "").length < 7) {
+      toast({ title: "Please enter a valid phone number", variant: "destructive" });
       return;
     }
     if (password.length < 6) {
@@ -53,6 +59,7 @@ const Signup = () => {
         data: {
           full_name: fullName,
           username: username,
+          phone: normalizedPhone,
         },
       },
     });
@@ -65,6 +72,18 @@ const Signup = () => {
         toast({ title: error.message, variant: "destructive" });
       }
       return;
+    }
+
+    // Save phone on profile (best-effort)
+    if (signUpData.user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({ phone: normalizedPhone })
+          .eq("user_id", signUpData.user.id);
+      } catch {
+        // non-critical
+      }
     }
 
     // Handle referral if ref code present
@@ -137,6 +156,21 @@ const Signup = () => {
               placeholder="Choose a username"
               autoComplete="username"
               maxLength={50}
+              className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="signup-phone" className="block text-sm font-medium text-muted-foreground mb-2">Phone Number</label>
+            <input
+              id="signup-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +2348012345678"
+              autoComplete="tel"
+              maxLength={20}
               className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               required
             />
