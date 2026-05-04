@@ -8,6 +8,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [referrerName, setReferrerName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
