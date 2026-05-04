@@ -13,6 +13,11 @@ const json = (body: Record<string, unknown>, status = 200) =>
 
 const normalizeUsername = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const normalizePhone = (value: string) => value.replace(/[^\d+]/g, "");
+const isPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 7 && /^[+\d][\d\s\-()]*$/.test(value);
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
