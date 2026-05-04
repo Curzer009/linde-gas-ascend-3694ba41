@@ -38,6 +38,10 @@ const Signup = () => {
       toast({ title: "Password must be at least 6 characters", variant: "destructive" });
       return;
     }
+    if (!acceptedTerms) {
+      toast({ title: "You must accept the Terms and Conditions", variant: "destructive" });
+      return;
+    }
 
     setLoading(true);
     const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@lindegas.app`;
