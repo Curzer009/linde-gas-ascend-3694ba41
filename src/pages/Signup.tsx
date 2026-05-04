@@ -74,6 +74,18 @@ const Signup = () => {
       return;
     }
 
+    // Save phone on profile (best-effort)
+    if (signUpData.user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({ phone: normalizedPhone })
+          .eq("user_id", signUpData.user.id);
+      } catch {
+        // non-critical
+      }
+    }
+
     // Handle referral if ref code present
     if (refCode && signUpData.user) {
       try {
