@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2 } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 const Wallet = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   const fetchBalance = async () => {
     if (!user) return;
@@ -26,6 +30,74 @@ const Wallet = () => {
   useEffect(() => {
     fetchBalance();
   }, [user]);
+
+  // Handle Paystack redirect: verify the payment and credit wallet immediately
+  useEffect(() => {
+    const reference =
+      searchParams.get("reference") || searchParams.get("trxref");
+    if (!reference || !user) return;
+
+    let cancelled = false;
+    setVerifying(true);
+
+    const verify = async () => {
+      let credited = false;
+      let lastAmount: number | null = null;
+
+      // Poll up to 6 times (covers race with webhook + Paystack confirmation)
+      for (let attempt = 0; attempt < 6 && !cancelled; attempt++) {
+        try {
+          const { data, error } = await supabase.functions.invoke(
+            "paystack-verify",
+            { body: { reference } }
+          );
+          if (error) throw error;
+          if (data?.success) {
+            credited = data.credited;
+            lastAmount = data.amount ?? null;
+            if (typeof data.balance === "number") setBalance(data.balance);
+            if (credited) break;
+          }
+        } catch (e) {
+          console.error("verify attempt failed", e);
+        }
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+
+      if (cancelled) return;
+
+      await fetchBalance();
+      setVerifying(false);
+
+      // Clean the URL
+      searchParams.delete("reference");
+      searchParams.delete("trxref");
+      setSearchParams(searchParams, { replace: true });
+
+      if (credited) {
+        toast({
+          title: "Payment successful",
+          description:
+            lastAmount != null
+              ? `₵${lastAmount.toFixed(2)} added to your wallet.`
+              : "Your wallet has been credited.",
+        });
+      } else {
+        toast({
+          title: "Payment processing",
+          description:
+            "We couldn't confirm your payment yet. Your balance will update shortly.",
+        });
+      }
+    };
+
+    verify();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, searchParams.get("reference"), searchParams.get("trxref")]);
+
 
   const handleDeposit = async () => {
     const val = parseFloat(amount);
