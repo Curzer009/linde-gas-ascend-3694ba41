@@ -1,7 +1,17 @@
 export default async function handler(req, res) {
-  const { reference, email, amount } = req.body;
+
+  // ✅ Prevent crash on browser visit
+  if (req.method !== "POST") {
+    return res.status(200).json({ message: "API working" });
+  }
 
   try {
+    const { reference } = req.body;
+
+    if (!reference) {
+      return res.status(400).json({ success: false });
+    }
+
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -14,17 +24,16 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.data.status === "success") {
-
-      // 🔥 FIX BALANCE HERE
-      console.log(`Payment verified for ${email}: ${amount}`);
-
-      return res.json({ success: true });
+      return res.json({
+        success: true,
+        amount: data.data.amount / 100
+      });
     }
 
     return res.json({ success: false });
 
   } catch (error) {
     console.error(error);
-    return res.json({ success: false });
+    return res.status(500).json({ success: false });
   }
 }
