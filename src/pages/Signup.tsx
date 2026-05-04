@@ -162,6 +162,21 @@ const Signup = () => {
           </div>
 
           <div>
+            <label htmlFor="signup-phone" className="block text-sm font-medium text-muted-foreground mb-2">Phone Number</label>
+            <input
+              id="signup-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +2348012345678"
+              autoComplete="tel"
+              maxLength={20}
+              className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
+              required
+            />
+          </div>
+
+          <div>
             <label htmlFor="signup-password" className="block text-sm font-medium text-muted-foreground mb-2">Password</label>
             <input
               id="signup-password"
