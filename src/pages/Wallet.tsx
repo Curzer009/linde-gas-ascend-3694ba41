@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2 } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2, ReceiptText } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,9 +13,18 @@ const Wallet = () => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
-  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
+  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [transactions, setTransactions] = useState<Array<{
+    id: string;
+    amount: number;
+    type: string;
+    status: string;
+    reference: string | null;
+    created_at: string;
+  }>>([]);
 
   const fetchBalance = async () => {
     if (!user) return;
@@ -27,8 +36,31 @@ const Wallet = () => {
     if (data) setBalance(Number(data.balance));
   };
 
+  const fetchTransactions = async () => {
+    if (!user) return;
+    setTransactionsLoading(true);
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("id, amount, type, status, reference, created_at")
+      .eq("user_id", user.id)
+      .in("type", ["deposit", "withdrawal"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (!error && data) {
+      setTransactions(
+        data.map((tx) => ({
+          ...tx,
+          amount: Number(tx.amount),
+        }))
+      );
+    }
+    setTransactionsLoading(false);
+  };
+
   useEffect(() => {
     fetchBalance();
+    fetchTransactions();
   }, [user]);
 
   // Handle Paystack redirect: verify the payment and credit wallet immediately
@@ -67,6 +99,7 @@ const Wallet = () => {
       if (cancelled) return;
 
       await fetchBalance();
+      await fetchTransactions();
       setVerifying(false);
 
       // Clean the URL
@@ -151,6 +184,7 @@ const Wallet = () => {
         title: `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
       });
       setAmount("");
+      fetchTransactions();
     } catch (err: any) {
       toast({ title: "Request failed", description: err.message, variant: "destructive" });
     } finally {
@@ -201,8 +235,15 @@ const Wallet = () => {
             >
               <ArrowUpCircle className="inline mr-2" size={18} /> Withdraw
             </button>
+            <button
+              onClick={() => setActiveTab("transactions")}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "transactions" ? "bg-gradient-gold text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <ReceiptText className="inline mr-2" size={18} /> History
+            </button>
           </div>
 
+          {activeTab !== "transactions" ? (
           <div className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">
@@ -240,6 +281,54 @@ const Wallet = () => {
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
+          ) : (
+          <div className="bg-card rounded-3xl border border-gold/10 p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-serif text-2xl font-bold text-foreground">Recent Transactions</h2>
+              {transactionsLoading && <Loader2 className="text-gold animate-spin" size={18} />}
+            </div>
+
+            {transactions.length === 0 && !transactionsLoading ? (
+              <div className="rounded-2xl border border-gold/10 bg-background/40 px-4 py-8 text-center text-sm text-muted-foreground">
+                No deposits or withdrawals yet.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {transactions.map((tx) => {
+                  const isDeposit = tx.type === "deposit";
+                  const created = new Date(tx.created_at).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  return (
+                    <div key={tx.id} className="flex items-center justify-between gap-4 rounded-2xl border border-gold/10 bg-background/40 px-4 py-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        {isDeposit ? (
+                          <ArrowDownCircle className="shrink-0 text-gold" size={22} />
+                        ) : (
+                          <ArrowUpCircle className="shrink-0 text-muted-foreground" size={22} />
+                        )}
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-foreground capitalize">{tx.type}</p>
+                          <p className="text-xs text-muted-foreground">{created}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-bold ${isDeposit ? "text-gold" : "text-foreground"}`}>
+                          {isDeposit ? "+" : "-"}₵{tx.amount.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">{tx.status}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          )}
         </div>
       </div>
     </div>

@@ -101,95 +101,70 @@ Deno.serve(async (req) => {
     let newBalance: number | null = null;
 
     if (isWalletDeposit) {
-      // Idempotent credit via reference
-      const { data: existingTxn } = await supabaseAdmin
-        .from("transactions")
-        .select("id")
-        .eq("reference", reference)
-        .maybeSingle();
-
-      if (!existingTxn) {
-        const { error: txnErr } = await supabaseAdmin.from("transactions").insert({
-          user_id: userId,
-          amount: amountInCedis,
-          type: "deposit",
-          status: "completed",
-          reference,
-          notes: "Paystack deposit",
-        });
-
-        if (!txnErr) {
-          const { data: depProfile } = await supabaseAdmin
-            .from("profiles")
-            .select("balance")
-            .eq("user_id", userId)
-            .single();
-          if (depProfile) {
-            const updated = Number(depProfile.balance) + amountInCedis;
-            await supabaseAdmin
-              .from("profiles")
-              .update({ balance: updated })
-              .eq("user_id", userId);
-            newBalance = updated;
-            credited = true;
-          }
-
-          // Process referral reward (mirrors webhook)
-          const { data: profile } = await supabaseAdmin
-            .from("profiles")
-            .select("referred_by")
-            .eq("user_id", userId)
-            .single();
-
-          if (profile?.referred_by) {
-            const reward = getReward(amountInCedis);
-            const { data: existingRef } = await supabaseAdmin
-              .from("referrals")
-              .select("id, status")
-              .eq("referred_id", userId)
-              .maybeSingle();
-
-            const creditReferrer = async () => {
-              const { data: refProfile } = await supabaseAdmin
-                .from("profiles")
-                .select("balance")
-                .eq("user_id", profile.referred_by)
-                .single();
-              if (refProfile) {
-                await supabaseAdmin
-                  .from("profiles")
-                  .update({ balance: Number(refProfile.balance) + reward })
-                  .eq("user_id", profile.referred_by);
-              }
-            };
-
-            if (existingRef && existingRef.status === "pending") {
-              await supabaseAdmin
-                .from("referrals")
-                .update({ product_name: productName, reward_amount: reward, status: "paid" })
-                .eq("id", existingRef.id);
-              await creditReferrer();
-            } else if (!existingRef) {
-              await supabaseAdmin.from("referrals").insert({
-                referrer_id: profile.referred_by,
-                referred_id: userId,
-                product_name: productName,
-                reward_amount: reward,
-                status: "paid",
-              });
-              await creditReferrer();
-            }
-          }
+      const { data: depositResult, error: depositError } = await supabaseAdmin.rpc(
+        "process_wallet_deposit",
+        {
+          p_user_id: userId,
+          p_amount: amountInCedis,
+          p_reference: reference,
+          p_notes: "Paystack deposit",
         }
-      } else {
-        // Already credited — just return current balance
-        const { data: depProfile } = await supabaseAdmin
+      );
+
+      if (depositError) throw depositError;
+
+      const result = Array.isArray(depositResult) ? depositResult[0] : depositResult;
+      const newlyCredited = Boolean(result?.credited);
+      credited = true;
+      newBalance = result?.balance != null ? Number(result.balance) : null;
+
+      // Process referral reward only once, when this payment newly credits the wallet
+      if (newlyCredited) {
+        const { data: profile } = await supabaseAdmin
           .from("profiles")
-          .select("balance")
+          .select("referred_by")
           .eq("user_id", userId)
           .single();
-        if (depProfile) newBalance = Number(depProfile.balance);
-        credited = true;
+
+        if (profile?.referred_by) {
+          const reward = getReward(amountInCedis);
+          const { data: existingRef } = await supabaseAdmin
+            .from("referrals")
+            .select("id, status")
+            .eq("referred_id", userId)
+            .maybeSingle();
+
+          const creditReferrer = async () => {
+            const { data: refProfile } = await supabaseAdmin
+              .from("profiles")
+              .select("balance")
+              .eq("user_id", profile.referred_by)
+              .single();
+            if (refProfile) {
+              await supabaseAdmin
+                .from("profiles")
+                .update({ balance: Number(refProfile.balance) + reward })
+                .eq("user_id", profile.referred_by);
+            }
+          };
+
+          if (existingRef && existingRef.status === "pending") {
+            await supabaseAdmin
+              .from("referrals")
+              .update({ product_name: productName, reward_amount: reward, status: "paid" })
+              .eq("id", existingRef.id);
+            await creditReferrer();
+          } else if (!existingRef) {
+            await supabaseAdmin.from("referrals").insert({
+              referrer_id: profile.referred_by,
+              referred_id: userId,
+              product_name: productName,
+              reward_amount: reward,
+              status: "paid",
+            });
+            await creditReferrer();
+          }
+        }
       }
     }
 

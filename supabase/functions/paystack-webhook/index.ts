@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     const secret = Deno.env.get("PAYSTACK_SECRET_KEY")!;
 
     if (!signature || !(await verifySignature(body, signature, secret))) {
-      return new Response("Invalid signature", { status: 401 });
+      return new Response("Invalid signature", { status: 401, headers: corsHeaders });
     }
 
     const event = JSON.parse(body);
@@ -82,39 +82,17 @@ Deno.serve(async (req) => {
         console.error("Failed to update subscription:", error);
       }
 
-      // Credit wallet for deposits (idempotent via reference)
+      // Credit wallet for deposits atomically and idempotently via reference
       if (isWalletDeposit && userId) {
-        const { data: existingTxn } = await supabase
-          .from("transactions")
-          .select("id")
-          .eq("reference", reference)
-          .maybeSingle();
+        const { error: depositErr } = await supabase.rpc("process_wallet_deposit", {
+          p_user_id: userId,
+          p_amount: amountInCedis,
+          p_reference: reference,
+          p_notes: "Paystack deposit",
+        });
 
-        if (!existingTxn) {
-          const { error: txnErr } = await supabase.from("transactions").insert({
-            user_id: userId,
-            amount: amountInCedis,
-            type: "deposit",
-            status: "completed",
-            reference,
-            notes: "Paystack deposit",
-          });
-
-          if (txnErr) {
-            console.error("Failed to log deposit txn:", txnErr);
-          } else {
-            const { data: depProfile } = await supabase
-              .from("profiles")
-              .select("balance")
-              .eq("user_id", userId)
-              .single();
-            if (depProfile) {
-              await supabase
-                .from("profiles")
-                .update({ balance: Number(depProfile.balance) + amountInCedis })
-                .eq("user_id", userId);
-            }
-          }
+        if (depositErr) {
+          console.error("Failed to process wallet deposit:", depositErr);
         }
       }
 
@@ -190,10 +168,10 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("Webhook error:", err);
-    return new Response("Server error", { status: 500 });
+    return new Response("Server error", { status: 500, headers: corsHeaders });
   }
 });

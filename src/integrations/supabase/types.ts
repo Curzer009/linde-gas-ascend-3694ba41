@@ -314,6 +314,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_wallet_deposit: {
+        Args: {
+          p_amount: number
+          p_notes?: string
+          p_reference: string
+          p_user_id: string
+        }
+        Returns: {
+          balance: number
+          credited: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
