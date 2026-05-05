@@ -42,6 +42,7 @@ const Wallet = () => {
     const { data, error } = await supabase
       .from("transactions")
       .select("id, amount, type, status, reference, created_at")
+      .eq("user_id", user.id)
       .in("type", ["deposit", "withdrawal"])
       .order("created_at", { ascending: false })
       .limit(20);
