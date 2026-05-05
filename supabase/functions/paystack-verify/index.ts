@@ -114,11 +114,12 @@ Deno.serve(async (req) => {
       if (depositError) throw depositError;
 
       const result = Array.isArray(depositResult) ? depositResult[0] : depositResult;
-      credited = Boolean(result?.credited);
+      const newlyCredited = Boolean(result?.credited);
+      credited = true;
       newBalance = result?.balance != null ? Number(result.balance) : null;
 
       // Process referral reward only once, when this payment newly credits the wallet
-      if (credited) {
+      if (newlyCredited) {
         const { data: profile } = await supabaseAdmin
           .from("profiles")
           .select("referred_by")
