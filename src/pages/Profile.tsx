@@ -114,8 +114,15 @@ const Profile = () => {
             <div className="flex items-center gap-4">
               <div className="text-gold text-sm">💰</div>
               <div>
-                <p className="text-muted-foreground text-xs">Balance</p>
+                <p className="text-muted-foreground text-xs">Available Balance</p>
                 <p className="text-gold font-bold text-lg">₵{Number(profile?.balance || 0).toFixed(2)}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-gold text-sm">🎁</div>
+              <div>
+                <p className="text-muted-foreground text-xs">Bonus Balance</p>
+                <p className="text-gold font-bold text-lg">₵{Number((profile as any)?.bonus_balance || 0).toFixed(2)}</p>
               </div>
             </div>
           </div>
