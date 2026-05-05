@@ -12,6 +12,7 @@ const Wallet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
+  const [bonusBalance, setBonusBalance] = useState(0);
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
@@ -30,10 +31,13 @@ const Wallet = () => {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("balance")
+      .select("balance, bonus_balance")
       .eq("user_id", user.id)
       .single();
-    if (data) setBalance(Number(data.balance));
+    if (data) {
+      setBalance(Number(data.balance));
+      setBonusBalance(Number((data as any).bonus_balance ?? 0));
+    }
   };
 
   const fetchTransactions = async () => {
@@ -43,7 +47,7 @@ const Wallet = () => {
       .from("transactions")
       .select("id, amount, type, status, reference, created_at")
       .eq("user_id", user.id)
-      .in("type", ["deposit", "withdrawal"])
+      .in("type", ["deposit", "withdrawal", "admin_credit", "bonus_credit", "purchase"])
       .order("created_at", { ascending: false })
       .limit(20);
 
@@ -87,7 +91,7 @@ const Wallet = () => {
           if (data?.success) {
             credited = data.credited;
             lastAmount = data.amount ?? null;
-            if (typeof data.balance === "number") setBalance(data.balance);
+            if (typeof data.balance === "number") setBonusBalance(data.balance);
             if (credited) break;
           }
         } catch (e) {
@@ -205,16 +209,23 @@ const Wallet = () => {
           </h1>
         </div>
 
-        {/* Balance Card */}
-        <div className="max-w-lg mx-auto mb-10">
-          <div className="bg-card rounded-3xl border border-gold/10 p-8 text-center">
-            <WalletIcon className="text-gold mx-auto mb-3" size={40} />
-            <p className="text-muted-foreground text-sm mb-1">Available Balance</p>
-            <p className="text-5xl font-serif font-bold text-gradient-gold">₵{balance.toFixed(2)}</p>
+        {/* Balance Cards */}
+        <div className="max-w-2xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-card rounded-3xl border border-gold/10 p-6 text-center">
+            <WalletIcon className="text-gold mx-auto mb-3" size={36} />
+            <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Available Balance</p>
+            <p className="text-4xl font-serif font-bold text-gradient-gold">₵{balance.toFixed(2)}</p>
+            <p className="text-[11px] text-muted-foreground mt-2">Withdraw only</p>
+          </div>
+          <div className="bg-card rounded-3xl border border-gold/10 p-6 text-center">
+            <WalletIcon className="text-gold mx-auto mb-3" size={36} />
+            <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Bonus Balance</p>
+            <p className="text-4xl font-serif font-bold text-gradient-gold">₵{bonusBalance.toFixed(2)}</p>
+            <p className="text-[11px] text-muted-foreground mt-2">Use to recharge products</p>
             {verifying && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gold">
-                <Loader2 className="animate-spin" size={16} />
-                Confirming your payment…
+              <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gold">
+                <Loader2 className="animate-spin" size={14} />
+                Confirming payment…
               </div>
             )}
           </div>
@@ -277,7 +288,7 @@ const Wallet = () => {
             )}
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "You'll be redirected to the LINDE GAS payment page to complete payment via Mobile Money."
+                ? "Deposits top up your bonus balance, used to recharge products. You'll be redirected to the LINDE GAS payment page to complete payment via Mobile Money."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>

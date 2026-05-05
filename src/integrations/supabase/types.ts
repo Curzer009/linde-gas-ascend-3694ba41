@@ -140,6 +140,7 @@ export type Database = {
       profiles: {
         Row: {
           balance: number
+          bonus_balance: number
           created_at: string
           full_name: string
           id: string
@@ -153,6 +154,7 @@ export type Database = {
         }
         Insert: {
           balance?: number
+          bonus_balance?: number
           created_at?: string
           full_name: string
           id?: string
@@ -166,6 +168,7 @@ export type Database = {
         }
         Update: {
           balance?: number
+          bonus_balance?: number
           created_at?: string
           full_name?: string
           id?: string
@@ -307,6 +310,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_credit_wallet: {
+        Args: {
+          p_account: string
+          p_admin_id: string
+          p_amount: number
+          p_notes?: string
+          p_user_id: string
+        }
+        Returns: {
+          balance: number
+          bonus_balance: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

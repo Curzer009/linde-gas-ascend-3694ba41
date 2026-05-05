@@ -44,8 +44,8 @@ const ProductCard = ({ product, balance, onPurchased }: { product: Product; bala
     }
     if (balance < product.price) {
       toast({
-        title: "Insufficient balance",
-        description: `You need ₵${product.price.toFixed(2)}. Recharge your wallet to continue.`,
+        title: "Insufficient bonus balance",
+        description: `You need ₵${product.price.toFixed(2)} in your bonus wallet. Recharge to continue.`,
         variant: "destructive",
       });
       navigate("/wallet");
@@ -145,8 +145,8 @@ const ProductsSection = () => {
 
   const fetchBalance = async () => {
     if (!user) return;
-    const { data } = await supabase.from("profiles").select("balance").eq("user_id", user.id).single();
-    if (data) setBalance(Number(data.balance));
+    const { data } = await supabase.from("profiles").select("bonus_balance").eq("user_id", user.id).single();
+    if (data) setBalance(Number((data as any).bonus_balance ?? 0));
   };
 
   useEffect(() => {
@@ -168,7 +168,7 @@ const ProductsSection = () => {
           </p>
           {user && (
             <p className="text-foreground mt-4 text-sm">
-              Wallet Balance: <span className="text-gold font-bold">₵{balance.toFixed(2)}</span>
+              Bonus Balance: <span className="text-gold font-bold">₵{balance.toFixed(2)}</span>
             </p>
           )}
         </div>

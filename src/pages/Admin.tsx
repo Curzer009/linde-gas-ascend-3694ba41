@@ -19,6 +19,7 @@ interface Profile {
   full_name: string;
   username: string;
   balance: number;
+  bonus_balance: number;
   is_suspended: boolean;
   created_at: string;
 }
@@ -146,6 +147,11 @@ const Admin = () => {
   const [editPayment, setEditPayment] = useState<PaymentMethod | null>(null);
   const [newPayment, setNewPayment] = useState(false);
   const [newPaymentData, setNewPaymentData] = useState({ name: "", details: "" });
+  const [creditMember, setCreditMember] = useState<Profile | null>(null);
+  const [creditAmount, setCreditAmount] = useState("");
+  const [creditAccount, setCreditAccount] = useState<"available" | "bonus">("bonus");
+  const [creditNotes, setCreditNotes] = useState("");
+  const [crediting, setCrediting] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -222,6 +228,37 @@ const Admin = () => {
       setEditMember(null);
       fetchAll();
     }
+  };
+
+  const submitCredit = async () => {
+    if (!creditMember || !user) return;
+    const amt = parseFloat(creditAmount);
+    if (!amt || amt <= 0) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    setCrediting(true);
+    const { error } = await supabase.rpc("admin_credit_wallet" as any, {
+      p_admin_id: user.id,
+      p_user_id: creditMember.user_id,
+      p_amount: amt,
+      p_account: creditAccount,
+      p_notes: creditNotes || null,
+    });
+    setCrediting(false);
+    if (error) {
+      toast({ title: "Credit failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({
+      title: `Credited ₵${amt.toFixed(2)} to @${creditMember.username}`,
+      description: `${creditAccount === "bonus" ? "Bonus" : "Available"} wallet updated.`,
+    });
+    setCreditMember(null);
+    setCreditAmount("");
+    setCreditNotes("");
+    setCreditAccount("bonus");
+    fetchAll();
   };
 
   // PRODUCTS
@@ -469,7 +506,8 @@ const Admin = () => {
                     <TableRow className="border-gold/10">
                       <TableHead>Name</TableHead>
                       <TableHead>Username</TableHead>
-                      <TableHead>Balance</TableHead>
+                      <TableHead>Available</TableHead>
+                      <TableHead>Bonus</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Joined</TableHead>
                       <TableHead>Actions</TableHead>
@@ -481,6 +519,7 @@ const Admin = () => {
                         <TableCell className="font-medium text-foreground">{m.full_name}</TableCell>
                         <TableCell className="text-muted-foreground">{m.username}</TableCell>
                         <TableCell className="text-gold font-semibold">₵{Number(m.balance).toFixed(2)}</TableCell>
+                        <TableCell className="text-gold font-semibold">₵{Number(m.bonus_balance || 0).toFixed(2)}</TableCell>
                         <TableCell>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.is_suspended ? "bg-destructive/20 text-destructive" : "bg-green-500/20 text-green-400"}`}>
                             {m.is_suspended ? "Suspended" : "Active"}
@@ -490,7 +529,10 @@ const Admin = () => {
                           {new Date(m.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" className="h-7 text-xs bg-gradient-gold text-primary-foreground hover:opacity-90" onClick={() => { setCreditMember(m); setCreditAccount("bonus"); }}>
+                              Credit
+                            </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => setEditMember({ ...m })}>
                               Edit
                             </Button>
@@ -737,6 +779,65 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* CREDIT MEMBER DIALOG */}
+      <Dialog open={!!creditMember} onOpenChange={(o) => !o && setCreditMember(null)}>
+        <DialogContent className="bg-card border-gold/10">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              Credit {creditMember ? `@${creditMember.username}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+          {creditMember && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCreditAccount("bonus")}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold border transition-colors ${creditAccount === "bonus" ? "bg-gradient-gold text-primary-foreground border-transparent" : "bg-secondary text-foreground border-gold/10 hover:bg-gold/10"}`}
+                >
+                  Bonus (recharge)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreditAccount("available")}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold border transition-colors ${creditAccount === "available" ? "bg-gradient-gold text-primary-foreground border-transparent" : "bg-secondary text-foreground border-gold/10 hover:bg-gold/10"}`}
+                >
+                  Available (withdrawable)
+                </button>
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Amount (₵)</label>
+                <Input
+                  type="number"
+                  value={creditAmount}
+                  onChange={(e) => setCreditAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="bg-secondary border-gold/10"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Notes (optional)</label>
+                <Input
+                  value={creditNotes}
+                  onChange={(e) => setCreditNotes(e.target.value)}
+                  placeholder="Reason for credit"
+                  className="bg-secondary border-gold/10"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Current — Available: <span className="text-gold">₵{Number(creditMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(creditMember.bonus_balance || 0).toFixed(2)}</span>
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreditMember(null)} className="border-gold/20">Cancel</Button>
+            <Button className="bg-gradient-gold text-primary-foreground" onClick={submitCredit} disabled={crediting}>
+              {crediting ? "Crediting..." : "Credit Wallet"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* EDIT MEMBER DIALOG */}
       <Dialog open={!!editMember} onOpenChange={() => setEditMember(null)}>
