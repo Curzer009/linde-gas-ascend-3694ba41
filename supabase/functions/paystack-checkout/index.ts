@@ -55,7 +55,9 @@ Deno.serve(async (req) => {
     const requestOrigin = req.headers.get("origin");
     const referer = req.headers.get("referer");
     const origin = requestOrigin || (referer ? new URL(referer).origin : "");
-    const callbackUrl = origin ? `${origin}/wallet` : undefined;
+    const callbackUrl = origin
+      ? `${origin}/wallet?reference=${encodeURIComponent(reference)}`
+      : undefined;
 
     const paystackRes = await fetch(
       "https://api.paystack.co/transaction/initialize",
