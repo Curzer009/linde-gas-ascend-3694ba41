@@ -506,7 +506,8 @@ const Admin = () => {
                     <TableRow className="border-gold/10">
                       <TableHead>Name</TableHead>
                       <TableHead>Username</TableHead>
-                      <TableHead>Balance</TableHead>
+                      <TableHead>Available</TableHead>
+                      <TableHead>Bonus</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Joined</TableHead>
                       <TableHead>Actions</TableHead>
@@ -518,6 +519,7 @@ const Admin = () => {
                         <TableCell className="font-medium text-foreground">{m.full_name}</TableCell>
                         <TableCell className="text-muted-foreground">{m.username}</TableCell>
                         <TableCell className="text-gold font-semibold">₵{Number(m.balance).toFixed(2)}</TableCell>
+                        <TableCell className="text-gold font-semibold">₵{Number(m.bonus_balance || 0).toFixed(2)}</TableCell>
                         <TableCell>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.is_suspended ? "bg-destructive/20 text-destructive" : "bg-green-500/20 text-green-400"}`}>
                             {m.is_suspended ? "Suspended" : "Active"}
@@ -527,7 +529,10 @@ const Admin = () => {
                           {new Date(m.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" className="h-7 text-xs bg-gradient-gold text-primary-foreground hover:opacity-90" onClick={() => { setCreditMember(m); setCreditAccount("bonus"); }}>
+                              Credit
+                            </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => setEditMember({ ...m })}>
                               Edit
                             </Button>
