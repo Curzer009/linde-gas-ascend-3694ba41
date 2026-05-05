@@ -230,6 +230,37 @@ const Admin = () => {
     }
   };
 
+  const submitCredit = async () => {
+    if (!creditMember || !user) return;
+    const amt = parseFloat(creditAmount);
+    if (!amt || amt <= 0) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    setCrediting(true);
+    const { error } = await supabase.rpc("admin_credit_wallet" as any, {
+      p_admin_id: user.id,
+      p_user_id: creditMember.user_id,
+      p_amount: amt,
+      p_account: creditAccount,
+      p_notes: creditNotes || null,
+    });
+    setCrediting(false);
+    if (error) {
+      toast({ title: "Credit failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({
+      title: `Credited ₵${amt.toFixed(2)} to @${creditMember.username}`,
+      description: `${creditAccount === "bonus" ? "Bonus" : "Available"} wallet updated.`,
+    });
+    setCreditMember(null);
+    setCreditAmount("");
+    setCreditNotes("");
+    setCreditAccount("bonus");
+    fetchAll();
+  };
+
   // PRODUCTS
   const saveProduct = async () => {
     if (!editProduct) return;
