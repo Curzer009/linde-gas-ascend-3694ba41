@@ -52,10 +52,9 @@ Deno.serve(async (req) => {
     const amountInPesewas = Math.round(amount * 100);
 
     // Determine callback URL from request origin so Paystack redirects back to /wallet
-    const origin =
-      req.headers.get("origin") ||
-      req.headers.get("referer")?.replace(/\/+$/, "") ||
-      "";
+    const requestOrigin = req.headers.get("origin");
+    const referer = req.headers.get("referer");
+    const origin = requestOrigin || (referer ? new URL(referer).origin : "");
     const callbackUrl = origin ? `${origin}/wallet` : undefined;
 
     const paystackRes = await fetch(
