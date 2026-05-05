@@ -19,6 +19,7 @@ interface Profile {
   full_name: string;
   username: string;
   balance: number;
+  bonus_balance: number;
   is_suspended: boolean;
   created_at: string;
 }
