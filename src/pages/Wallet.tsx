@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2 } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2, ReceiptText } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,9 +13,18 @@ const Wallet = () => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
-  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
+  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [transactions, setTransactions] = useState<Array<{
+    id: string;
+    amount: number;
+    type: string;
+    status: string;
+    reference: string | null;
+    created_at: string;
+  }>>([]);
 
   const fetchBalance = async () => {
     if (!user) return;
@@ -27,8 +36,30 @@ const Wallet = () => {
     if (data) setBalance(Number(data.balance));
   };
 
+  const fetchTransactions = async () => {
+    if (!user) return;
+    setTransactionsLoading(true);
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("id, amount, type, status, reference, created_at")
+      .in("type", ["deposit", "withdrawal"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (!error && data) {
+      setTransactions(
+        data.map((tx) => ({
+          ...tx,
+          amount: Number(tx.amount),
+        }))
+      );
+    }
+    setTransactionsLoading(false);
+  };
+
   useEffect(() => {
     fetchBalance();
+    fetchTransactions();
   }, [user]);
 
   // Handle Paystack redirect: verify the payment and credit wallet immediately
@@ -67,6 +98,7 @@ const Wallet = () => {
       if (cancelled) return;
 
       await fetchBalance();
+      await fetchTransactions();
       setVerifying(false);
 
       // Clean the URL
@@ -151,6 +183,7 @@ const Wallet = () => {
         title: `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
       });
       setAmount("");
+      fetchTransactions();
     } catch (err: any) {
       toast({ title: "Request failed", description: err.message, variant: "destructive" });
     } finally {
