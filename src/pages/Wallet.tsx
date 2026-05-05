@@ -12,6 +12,7 @@ const Wallet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
+  const [bonusBalance, setBonusBalance] = useState(0);
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
@@ -30,10 +31,13 @@ const Wallet = () => {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("balance")
+      .select("balance, bonus_balance")
       .eq("user_id", user.id)
       .single();
-    if (data) setBalance(Number(data.balance));
+    if (data) {
+      setBalance(Number(data.balance));
+      setBonusBalance(Number((data as any).bonus_balance ?? 0));
+    }
   };
 
   const fetchTransactions = async () => {
