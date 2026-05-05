@@ -44,8 +44,8 @@ const ProductCard = ({ product, balance, onPurchased }: { product: Product; bala
     }
     if (balance < product.price) {
       toast({
-        title: "Insufficient balance",
-        description: `You need ₵${product.price.toFixed(2)}. Recharge your wallet to continue.`,
+        title: "Insufficient bonus balance",
+        description: `You need ₵${product.price.toFixed(2)} in your bonus wallet. Recharge to continue.`,
         variant: "destructive",
       });
       navigate("/wallet");
