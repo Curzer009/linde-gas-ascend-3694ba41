@@ -147,6 +147,11 @@ const Admin = () => {
   const [editPayment, setEditPayment] = useState<PaymentMethod | null>(null);
   const [newPayment, setNewPayment] = useState(false);
   const [newPaymentData, setNewPaymentData] = useState({ name: "", details: "" });
+  const [creditMember, setCreditMember] = useState<Profile | null>(null);
+  const [creditAmount, setCreditAmount] = useState("");
+  const [creditAccount, setCreditAccount] = useState<"available" | "bonus">("bonus");
+  const [creditNotes, setCreditNotes] = useState("");
+  const [crediting, setCrediting] = useState(false);
 
   useEffect(() => {
     fetchAll();
