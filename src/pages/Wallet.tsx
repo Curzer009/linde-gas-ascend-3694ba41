@@ -91,7 +91,7 @@ const Wallet = () => {
           if (data?.success) {
             credited = data.credited;
             lastAmount = data.amount ?? null;
-            if (typeof data.balance === "number") setBalance(data.balance);
+            if (typeof data.balance === "number") setBonusBalance(data.balance);
             if (credited) break;
           }
         } catch (e) {
