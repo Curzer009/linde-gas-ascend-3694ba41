@@ -47,7 +47,7 @@ const Wallet = () => {
       .from("transactions")
       .select("id, amount, type, status, reference, created_at")
       .eq("user_id", user.id)
-      .in("type", ["deposit", "withdrawal"])
+      .in("type", ["deposit", "withdrawal", "admin_credit", "bonus_credit", "purchase"])
       .order("created_at", { ascending: false })
       .limit(20);
 
