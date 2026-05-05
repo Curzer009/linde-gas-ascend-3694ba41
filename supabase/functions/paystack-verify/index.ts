@@ -15,10 +15,40 @@ const REWARD_MAP: Record<number, number> = {
 };
 const getReward = (amt: number) => REWARD_MAP[amt] || 15;
 
+const errorMessage = (err: unknown) => {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object" && "message" in err) {
+    return String((err as { message?: unknown }).message || "Unknown error");
+  }
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return "Unknown error";
+  }
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY");
+
+    if (!supabaseUrl || !anonKey || !serviceRoleKey || !paystackSecretKey) {
+      console.error("paystack-verify config missing", {
+        hasSupabaseUrl: Boolean(supabaseUrl),
+        hasAnonKey: Boolean(anonKey),
+        hasServiceRoleKey: Boolean(serviceRoleKey),
+        hasPaystackSecretKey: Boolean(paystackSecretKey),
+      });
+      return new Response(JSON.stringify({ error: "Payment verification is not configured correctly" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -28,8 +58,8 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
+      supabaseUrl,
+      anonKey,
       { global: { headers: { Authorization: authHeader } } }
     );
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -53,10 +83,18 @@ Deno.serve(async (req) => {
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
         headers: {
-          Authorization: `Bearer ${Deno.env.get("PAYSTACK_SECRET_KEY")}`,
+          Authorization: `Bearer ${paystackSecretKey}`,
         },
       }
     );
+    if (!verifyRes.ok) {
+      const body = await verifyRes.text();
+      console.error("Paystack verify failed", verifyRes.status, body);
+      return new Response(JSON.stringify({ success: false, status: "failed" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const verifyData = await verifyRes.json();
 
     if (!verifyData.status || verifyData.data?.status !== "success") {
@@ -87,8 +125,8 @@ Deno.serve(async (req) => {
     const userId = metaUserId || user.id;
 
     const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      supabaseUrl,
+      serviceRoleKey
     );
 
     // Mark subscription paid
@@ -181,8 +219,8 @@ Deno.serve(async (req) => {
       }
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("paystack-verify error:", message);
+    const message = errorMessage(err);
+    console.error("paystack-verify error:", message, err);
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
