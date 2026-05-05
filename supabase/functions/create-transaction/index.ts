@@ -61,27 +61,42 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // For withdrawals & purchases, check balance server-side
+    // Withdrawals come strictly from the available (withdrawable) balance.
+    // Purchases come strictly from the bonus balance.
     if (type === "withdrawal" || type === "purchase") {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
-        .select("balance")
+        .select("balance, bonus_balance")
         .eq("user_id", user.id)
         .single();
 
-      if (!profile || Number(profile.balance) < parsedAmount) {
+      if (!profile) {
         return new Response(
-          JSON.stringify({ error: "Insufficient balance" }),
+          JSON.stringify({ error: "Profile not found" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      // For purchases, deduct balance immediately
+      if (type === "withdrawal") {
+        if (Number(profile.balance) < parsedAmount) {
+          return new Response(
+            JSON.stringify({ error: "Insufficient available balance" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+
       if (type === "purchase") {
-        const newBalance = Number(profile.balance) - parsedAmount;
+        if (Number(profile.bonus_balance) < parsedAmount) {
+          return new Response(
+            JSON.stringify({ error: "Insufficient bonus balance. Please recharge your bonus wallet." }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const newBonus = Number(profile.bonus_balance) - parsedAmount;
         const { error: updErr } = await supabaseAdmin
           .from("profiles")
-          .update({ balance: newBalance })
+          .update({ bonus_balance: newBonus })
           .eq("user_id", user.id);
         if (updErr) {
           return new Response(JSON.stringify({ error: updErr.message }), {
