@@ -18,7 +18,7 @@ const Profile = () => {
     if (user) {
       supabase
         .from("profiles")
-        .select("full_name, username, balance, created_at, phone")
+        .select("full_name, username, balance, bonus_balance, created_at, phone")
         .eq("user_id", user.id)
         .single()
         .then(({ data }) => {
