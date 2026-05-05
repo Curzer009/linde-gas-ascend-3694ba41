@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
         headers: {
-          Authorization: `Bearer ${Deno.env.get("PAYSTACK_SECRET_KEY")}`,
+          Authorization: `Bearer ${paystackSecretKey}`,
         },
       }
     );
