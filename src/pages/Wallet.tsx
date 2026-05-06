@@ -245,7 +245,6 @@ const Wallet = () => {
             <WalletIcon className="text-gold mx-auto mb-3" size={36} />
             <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Available Balance</p>
             <p className="text-4xl font-serif font-bold text-gradient-gold">₵{balance.toFixed(2)}</p>
-            <p className="text-[11px] text-muted-foreground mt-2">Withdraw only</p>
           </div>
           <div className="bg-card rounded-3xl border border-gold/10 p-6 text-center">
             <WalletIcon className="text-gold mx-auto mb-3" size={36} />
