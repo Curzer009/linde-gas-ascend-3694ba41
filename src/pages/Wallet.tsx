@@ -8,6 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import mtnLogo from "@/assets/network-mtn.png";
 import telecelLogo from "@/assets/network-telecel.png";
 import airteltigoLogo from "@/assets/network-airteltigo.png";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const NETWORKS = [
   { id: "MTN", label: "MTN", logo: mtnLogo },
@@ -238,13 +245,11 @@ const Wallet = () => {
             <WalletIcon className="text-gold mx-auto mb-3" size={36} />
             <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Available Balance</p>
             <p className="text-4xl font-serif font-bold text-gradient-gold">₵{balance.toFixed(2)}</p>
-            <p className="text-[11px] text-muted-foreground mt-2">Withdraw only</p>
           </div>
           <div className="bg-card rounded-3xl border border-gold/10 p-6 text-center">
             <WalletIcon className="text-gold mx-auto mb-3" size={36} />
             <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Bonus Balance</p>
             <p className="text-4xl font-serif font-bold text-gradient-gold">₵{bonusBalance.toFixed(2)}</p>
-            <p className="text-[11px] text-muted-foreground mt-2">Use to recharge products</p>
             {verifying && (
               <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gold">
                 <Loader2 className="animate-spin" size={14} />
@@ -299,19 +304,34 @@ const Wallet = () => {
                   <label className="block text-sm font-medium text-muted-foreground mb-2">
                     Network Provider
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {NETWORKS.map((n) => (
-                      <button
-                        key={n.id}
-                        type="button"
-                        onClick={() => setNetworkProvider(n.id)}
-                        className={`flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl border transition-colors ${networkProvider === n.id ? "border-gold bg-gold/10" : "border-gold/10 bg-background hover:border-gold/30"}`}
-                      >
-                        <img src={n.logo} alt={n.label} loading="lazy" width={48} height={48} className="h-10 w-10 object-contain" />
-                        <span className="text-[11px] font-semibold text-foreground">{n.label}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <Select
+                    value={networkProvider}
+                    onValueChange={(v) => setNetworkProvider(v as typeof networkProvider)}
+                  >
+                    <SelectTrigger className="w-full h-12 px-4 rounded-xl bg-background border-gold/10 text-foreground hover:border-gold/30 focus:ring-gold/30">
+                      <SelectValue>
+                        {(() => {
+                          const n = NETWORKS.find((x) => x.id === networkProvider)!;
+                          return (
+                            <div className="flex items-center gap-2">
+                              <img src={n.logo} alt={n.label} width={24} height={24} className="h-6 w-6 object-contain" />
+                              <span className="font-semibold">{n.label}</span>
+                            </div>
+                          );
+                        })()}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-gold/20">
+                      {NETWORKS.map((n) => (
+                        <SelectItem key={n.id} value={n.id} className="focus:bg-gold/10">
+                          <div className="flex items-center gap-2">
+                            <img src={n.logo} alt={n.label} width={24} height={24} className="h-6 w-6 object-contain" />
+                            <span className="font-semibold">{n.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground mb-2">
