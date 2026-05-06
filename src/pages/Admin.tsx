@@ -627,7 +627,7 @@ const Admin = () => {
                     ))}
                     {transactions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
+                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
