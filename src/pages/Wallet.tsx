@@ -5,6 +5,15 @@ import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import mtnLogo from "@/assets/network-mtn.png";
+import telecelLogo from "@/assets/network-telecel.png";
+import airteltigoLogo from "@/assets/network-airteltigo.png";
+
+const NETWORKS = [
+  { id: "MTN", label: "MTN", logo: mtnLogo },
+  { id: "TELECEL", label: "Telecel", logo: telecelLogo },
+  { id: "AIRTELTIGO", label: "AirtelTigo", logo: airteltigoLogo },
+] as const;
 
 const Wallet = () => {
   const { user } = useAuth();
@@ -14,6 +23,8 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [amount, setAmount] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [networkProvider, setNetworkProvider] = useState<"MTN" | "TELECEL" | "AIRTELTIGO">("MTN");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
