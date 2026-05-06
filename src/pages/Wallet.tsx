@@ -292,6 +292,43 @@ const Wallet = () => {
                 className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               />
             </div>
+
+            {activeTab === "withdraw" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Network Provider
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {NETWORKS.map((n) => (
+                      <button
+                        key={n.id}
+                        type="button"
+                        onClick={() => setNetworkProvider(n.id)}
+                        className={`flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl border transition-colors ${networkProvider === n.id ? "border-gold bg-gold/10" : "border-gold/10 bg-background hover:border-gold/30"}`}
+                      >
+                        <img src={n.logo} alt={n.label} loading="lazy" width={48} height={48} className="h-10 w-10 object-contain" />
+                        <span className="text-[11px] font-semibold text-foreground">{n.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Mobile Money Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="e.g. 0241234567"
+                    inputMode="tel"
+                    maxLength={15}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
+                  />
+                </div>
+              </>
+            )}
             <button
               onClick={activeTab === "deposit" ? handleDeposit : handleWithdraw}
               disabled={loading}
