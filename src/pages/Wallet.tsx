@@ -187,10 +187,21 @@ const Wallet = () => {
       return;
     }
 
+    const phoneTrimmed = phoneNumber.trim();
+    if (!/^[0-9+\-\s]{9,15}$/.test(phoneTrimmed)) {
+      toast({ title: "Enter a valid phone number", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-transaction", {
-        body: { amount: val, type: "withdrawal" },
+        body: {
+          amount: val,
+          type: "withdrawal",
+          phone_number: phoneTrimmed,
+          network_provider: networkProvider,
+        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -199,6 +210,7 @@ const Wallet = () => {
         title: `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
       });
       setAmount("");
+      setPhoneNumber("");
       fetchTransactions();
     } catch (err: any) {
       toast({ title: "Request failed", description: err.message, variant: "destructive" });
