@@ -37,7 +37,19 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { amount, type, notes } = await req.json();
+    const { amount, type, notes, phone_number, network_provider } = await req.json();
+
+    // Validate withdrawal-specific fields
+    if (type === "withdrawal") {
+      const phoneOk = typeof phone_number === "string" && /^[0-9+\-\s]{9,15}$/.test(phone_number.trim());
+      const providerOk = ["MTN", "TELECEL", "AIRTELTIGO"].includes(String(network_provider || "").toUpperCase());
+      if (!phoneOk || !providerOk) {
+        return new Response(
+          JSON.stringify({ error: "Valid phone number and network provider (MTN, TELECEL, AIRTELTIGO) are required" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // Validate type
     if (!["deposit", "withdrawal", "purchase"].includes(type)) {
