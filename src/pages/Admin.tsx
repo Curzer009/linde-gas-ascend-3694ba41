@@ -571,6 +571,7 @@ const Admin = () => {
                       <TableHead>User</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Mobile Money</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Reference</TableHead>
                       <TableHead>Date</TableHead>
