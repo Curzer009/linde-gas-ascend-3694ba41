@@ -5,6 +5,15 @@ import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import mtnLogo from "@/assets/network-mtn.png";
+import telecelLogo from "@/assets/network-telecel.png";
+import airteltigoLogo from "@/assets/network-airteltigo.png";
+
+const NETWORKS = [
+  { id: "MTN", label: "MTN", logo: mtnLogo },
+  { id: "TELECEL", label: "Telecel", logo: telecelLogo },
+  { id: "AIRTELTIGO", label: "AirtelTigo", logo: airteltigoLogo },
+] as const;
 
 const Wallet = () => {
   const { user } = useAuth();
@@ -14,6 +23,8 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [amount, setAmount] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [networkProvider, setNetworkProvider] = useState<"MTN" | "TELECEL" | "AIRTELTIGO">("MTN");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -176,10 +187,21 @@ const Wallet = () => {
       return;
     }
 
+    const phoneTrimmed = phoneNumber.trim();
+    if (!/^[0-9+\-\s]{9,15}$/.test(phoneTrimmed)) {
+      toast({ title: "Enter a valid phone number", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-transaction", {
-        body: { amount: val, type: "withdrawal" },
+        body: {
+          amount: val,
+          type: "withdrawal",
+          phone_number: phoneTrimmed,
+          network_provider: networkProvider,
+        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -188,6 +210,7 @@ const Wallet = () => {
         title: `Withdrawal request of ₵${val.toFixed(2)} submitted. Processing within 24hrs.`,
       });
       setAmount("");
+      setPhoneNumber("");
       fetchTransactions();
     } catch (err: any) {
       toast({ title: "Request failed", description: err.message, variant: "destructive" });
@@ -269,6 +292,43 @@ const Wallet = () => {
                 className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
               />
             </div>
+
+            {activeTab === "withdraw" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Network Provider
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {NETWORKS.map((n) => (
+                      <button
+                        key={n.id}
+                        type="button"
+                        onClick={() => setNetworkProvider(n.id)}
+                        className={`flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl border transition-colors ${networkProvider === n.id ? "border-gold bg-gold/10" : "border-gold/10 bg-background hover:border-gold/30"}`}
+                      >
+                        <img src={n.logo} alt={n.label} loading="lazy" width={48} height={48} className="h-10 w-10 object-contain" />
+                        <span className="text-[11px] font-semibold text-foreground">{n.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Mobile Money Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="e.g. 0241234567"
+                    inputMode="tel"
+                    maxLength={15}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/30 transition-colors"
+                  />
+                </div>
+              </>
+            )}
             <button
               onClick={activeTab === "deposit" ? handleDeposit : handleWithdraw}
               disabled={loading}

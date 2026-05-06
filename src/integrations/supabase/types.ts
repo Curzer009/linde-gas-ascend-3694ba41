@@ -256,7 +256,9 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          network_provider: string | null
           notes: string | null
+          phone_number: string | null
           reference: string | null
           status: string
           type: string
@@ -267,7 +269,9 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          network_provider?: string | null
           notes?: string | null
+          phone_number?: string | null
           reference?: string | null
           status?: string
           type: string
@@ -278,7 +282,9 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          network_provider?: string | null
           notes?: string | null
+          phone_number?: string | null
           reference?: string | null
           status?: string
           type?: string
@@ -322,6 +328,10 @@ export type Database = {
           balance: number
           bonus_balance: number
         }[]
+      }
+      admin_set_suspension: {
+        Args: { p_admin_id: string; p_suspended: boolean; p_user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {

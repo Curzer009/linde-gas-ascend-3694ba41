@@ -32,6 +32,8 @@ interface Transaction {
   status: string;
   reference: string | null;
   notes: string | null;
+  phone_number: string | null;
+  network_provider: string | null;
   created_at: string;
 }
 
@@ -199,10 +201,12 @@ const Admin = () => {
 
   // MEMBERS
   const toggleSuspend = async (profile: Profile) => {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ is_suspended: !profile.is_suspended })
-      .eq("id", profile.id);
+    if (!user) return;
+    const { error } = await supabase.rpc("admin_set_suspension" as any, {
+      p_admin_id: user.id,
+      p_user_id: profile.user_id,
+      p_suspended: !profile.is_suspended,
+    });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -567,6 +571,7 @@ const Admin = () => {
                       <TableHead>User</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Mobile Money</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Reference</TableHead>
                       <TableHead>Date</TableHead>
@@ -583,6 +588,16 @@ const Admin = () => {
                           </span>
                         </TableCell>
                         <TableCell className="text-gold font-semibold">₵{Number(t.amount).toFixed(2)}</TableCell>
+                        <TableCell className="text-xs">
+                          {t.type === "withdrawal" && (t.phone_number || t.network_provider) ? (
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-foreground">{t.network_provider || "—"}</p>
+                              <p className="text-muted-foreground">{t.phone_number || "—"}</p>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                             t.status === "approved" ? "bg-green-500/20 text-green-400" :
@@ -612,7 +627,7 @@ const Admin = () => {
                     ))}
                     {transactions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
+                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
