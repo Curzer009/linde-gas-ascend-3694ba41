@@ -32,6 +32,8 @@ interface Transaction {
   status: string;
   reference: string | null;
   notes: string | null;
+  phone_number: string | null;
+  network_provider: string | null;
   created_at: string;
 }
 
