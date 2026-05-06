@@ -199,10 +199,12 @@ const Admin = () => {
 
   // MEMBERS
   const toggleSuspend = async (profile: Profile) => {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ is_suspended: !profile.is_suspended })
-      .eq("id", profile.id);
+    if (!user) return;
+    const { error } = await supabase.rpc("admin_set_suspension" as any, {
+      p_admin_id: user.id,
+      p_user_id: profile.user_id,
+      p_suspended: !profile.is_suspended,
+    });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
