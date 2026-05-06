@@ -251,7 +251,6 @@ const Wallet = () => {
             <WalletIcon className="text-gold mx-auto mb-3" size={36} />
             <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Bonus Balance</p>
             <p className="text-4xl font-serif font-bold text-gradient-gold">₵{bonusBalance.toFixed(2)}</p>
-            <p className="text-[11px] text-muted-foreground mt-2">Use to recharge products</p>
             {verifying && (
               <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gold">
                 <Loader2 className="animate-spin" size={14} />
