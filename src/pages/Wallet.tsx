@@ -304,19 +304,34 @@ const Wallet = () => {
                   <label className="block text-sm font-medium text-muted-foreground mb-2">
                     Network Provider
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {NETWORKS.map((n) => (
-                      <button
-                        key={n.id}
-                        type="button"
-                        onClick={() => setNetworkProvider(n.id)}
-                        className={`flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl border transition-colors ${networkProvider === n.id ? "border-gold bg-gold/10" : "border-gold/10 bg-background hover:border-gold/30"}`}
-                      >
-                        <img src={n.logo} alt={n.label} loading="lazy" width={48} height={48} className="h-10 w-10 object-contain" />
-                        <span className="text-[11px] font-semibold text-foreground">{n.label}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <Select
+                    value={networkProvider}
+                    onValueChange={(v) => setNetworkProvider(v as typeof networkProvider)}
+                  >
+                    <SelectTrigger className="w-full h-12 px-4 rounded-xl bg-background border-gold/10 text-foreground hover:border-gold/30 focus:ring-gold/30">
+                      <SelectValue>
+                        {(() => {
+                          const n = NETWORKS.find((x) => x.id === networkProvider)!;
+                          return (
+                            <div className="flex items-center gap-2">
+                              <img src={n.logo} alt={n.label} width={24} height={24} className="h-6 w-6 object-contain" />
+                              <span className="font-semibold">{n.label}</span>
+                            </div>
+                          );
+                        })()}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-gold/20">
+                      {NETWORKS.map((n) => (
+                        <SelectItem key={n.id} value={n.id} className="focus:bg-gold/10">
+                          <div className="flex items-center gap-2">
+                            <img src={n.logo} alt={n.label} width={24} height={24} className="h-6 w-6 object-contain" />
+                            <span className="font-semibold">{n.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground mb-2">
