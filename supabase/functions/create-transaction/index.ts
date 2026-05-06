@@ -126,6 +126,8 @@ Deno.serve(async (req) => {
       status: type === "purchase" ? "completed" : "pending",
       notes: notes ? String(notes).slice(0, 500) : null,
       reference: `txn_${user.id.slice(0, 8)}_${Date.now()}`,
+      phone_number: type === "withdrawal" ? String(phone_number).trim() : null,
+      network_provider: type === "withdrawal" ? String(network_provider).toUpperCase() : null,
     }).select().single();
 
     if (error) {
