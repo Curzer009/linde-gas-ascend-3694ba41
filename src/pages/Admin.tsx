@@ -588,6 +588,16 @@ const Admin = () => {
                           </span>
                         </TableCell>
                         <TableCell className="text-gold font-semibold">₵{Number(t.amount).toFixed(2)}</TableCell>
+                        <TableCell className="text-xs">
+                          {t.type === "withdrawal" && (t.phone_number || t.network_provider) ? (
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-foreground">{t.network_provider || "—"}</p>
+                              <p className="text-muted-foreground">{t.phone_number || "—"}</p>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                             t.status === "approved" ? "bg-green-500/20 text-green-400" :
