@@ -8,6 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import mtnLogo from "@/assets/network-mtn.png";
 import telecelLogo from "@/assets/network-telecel.png";
 import airteltigoLogo from "@/assets/network-airteltigo.png";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const NETWORKS = [
   { id: "MTN", label: "MTN", logo: mtnLogo },
