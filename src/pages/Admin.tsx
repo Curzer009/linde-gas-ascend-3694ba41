@@ -506,6 +506,114 @@ const Admin = () => {
             </TabsTrigger>
           </TabsList>
 
+          {/* OVERVIEW TAB */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <ArrowDownCircle size={16} className="text-green-500" />
+                    <span className="text-xs uppercase tracking-wider">Total Deposits</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalDeposits.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">₵{depositsToday.toFixed(2)} today</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <ArrowUpCircle size={16} className="text-destructive" />
+                    <span className="text-xs uppercase tracking-wider">Withdrawn</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalWithdrawn.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{withdrawals.length} requests total</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Clock size={16} className="text-gold" />
+                    <span className="text-xs uppercase tracking-wider">Pending Payouts</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalPendingOut.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{pendingWithdrawals.length} awaiting review</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Wallet size={16} className="text-gold" />
+                    <span className="text-xs uppercase tracking-wider">Wallet Liability</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{(totalAvailable + totalBonus).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ₵{totalAvailable.toFixed(2)} available · ₵{totalBonus.toFixed(2)} bonus
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <Users className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{members.length}</p>
+                  <p className="text-xs text-muted-foreground">Members · {newToday} new today</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <Package className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{purchases.length}</p>
+                  <p className="text-xs text-muted-foreground">Product purchases</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <MessageCircle className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{tickets.filter((t) => t.status === "open").length}</p>
+                  <p className="text-xs text-muted-foreground">Open support tickets</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <UserX className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{suspendedCount}</p>
+                  <p className="text-xs text-muted-foreground">Suspended accounts</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-gold/10 bg-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-foreground text-base">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {recentActivity.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No activity yet.</p>
+                )}
+                {recentActivity.map((t) => (
+                  <div key={t.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background/60 border border-gold/10">
+                    <div className="min-w-0">
+                      <p className="text-sm text-foreground font-medium truncate">
+                        @{getMemberName(t.user_id)} · {t.type.replace(/_/g, " ")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(t.created_at).toLocaleString()}
+                        {t.network_provider ? ` · ${t.network_provider}` : ""}
+                        {t.phone_number ? ` · ${t.phone_number}` : ""}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-foreground">₵{Number(t.amount).toFixed(2)}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* MEMBERS TAB */}
           <TabsContent value="members">
             <Card className="border-gold/10 bg-card">
