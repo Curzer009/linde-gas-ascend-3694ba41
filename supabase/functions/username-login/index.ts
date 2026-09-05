@@ -47,29 +47,38 @@ Deno.serve(async (req) => {
       let userId: string | null = null;
 
       if (isPhone(rawIdentifier)) {
-        const phone = normalizePhone(rawIdentifier);
-        const { data: profile } = await admin
+        const digits = rawIdentifier.replace(/\D/g, "");
+        const tail = digits.slice(-9);
+        const { data: phoneMatches } = await admin
           .from("profiles")
-          .select("user_id")
-          .eq("phone", phone)
-          .maybeSingle();
-        if (profile?.user_id) userId = profile.user_id;
+          .select("user_id, phone")
+          .not("phone", "is", null)
+          .ilike("phone", `%${tail}`);
+        const match = (phoneMatches ?? []).find(
+          (p) => (p.phone ?? "").replace(/\D/g, "").slice(-9) === tail,
+        );
+        if (match?.user_id) userId = match.user_id;
       }
 
       if (!userId) {
         const username = normalizeUsername(rawIdentifier);
         if (!username) return json({ error: "Invalid username or password" }, 400);
 
-        const { data: profile, error: profileError } = await admin
+        // Case/space-insensitive username lookup
+        const { data: candidates } = await admin
           .from("profiles")
-          .select("user_id")
-          .eq("username", username)
-          .maybeSingle();
+          .select("user_id, username")
+          .ilike("username", `%${username.slice(0, 3)}%`)
+          .limit(200);
 
-        if (profileError || !profile?.user_id) {
+        const match = (candidates ?? []).find(
+          (p) => normalizeUsername(p.username ?? "") === username,
+        );
+
+        if (!match?.user_id) {
           return json({ error: "Invalid username or password" }, 400);
         }
-        userId = profile.user_id;
+        userId = match.user_id;
       }
 
       const { data: userData, error: userError } = await admin.auth.admin.getUserById(userId);
