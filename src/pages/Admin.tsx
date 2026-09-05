@@ -479,8 +479,11 @@ const Admin = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="members" className="w-full">
-          <TabsList className="w-full bg-card border border-gold/10 mb-6">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="w-full bg-card border border-gold/10 mb-6 flex-wrap h-auto">
+            <TabsTrigger value="overview" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
+              <LayoutDashboard size={14} className="mr-1.5" /> Overview
+            </TabsTrigger>
             <TabsTrigger value="members" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
               <Users size={14} className="mr-1.5" /> Members
             </TabsTrigger>
