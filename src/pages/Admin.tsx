@@ -446,38 +446,6 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Users className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{members.length}</p>
-              <p className="text-xs text-muted-foreground">Members</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Receipt className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{transactions.length}</p>
-              <p className="text-xs text-muted-foreground">Transactions</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Package className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{products.length}</p>
-              <p className="text-xs text-muted-foreground">Products</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <CreditCard className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{paymentMethods.length}</p>
-              <p className="text-xs text-muted-foreground">Payment Methods</p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="w-full bg-card border border-gold/10 mb-6 flex-wrap h-auto">
