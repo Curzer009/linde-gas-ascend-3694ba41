@@ -333,6 +333,18 @@ export type Database = {
         Args: { p_admin_id: string; p_suspended: boolean; p_user_id: string }
         Returns: boolean
       }
+      admin_settle_withdrawal: {
+        Args: {
+          p_admin_id: string
+          p_approve: boolean
+          p_notes?: string
+          p_transaction_id: string
+        }
+        Returns: {
+          refunded: number
+          status: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
