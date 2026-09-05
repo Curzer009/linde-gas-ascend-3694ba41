@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search, MessageCircle, Mail, KeyRound, AlertTriangle } from "lucide-react";
+import { Users, Receipt, Package, CreditCard, LogOut, Shield, Search, MessageCircle, Mail, KeyRound, AlertTriangle, LayoutDashboard, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, UserX } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -356,6 +356,22 @@ const Admin = () => {
     return m ? m.username : userId.slice(0, 8);
   };
 
+  const sum = (list: Transaction[]) => list.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const deposits = transactions.filter((t) => t.type === "deposit" && t.status === "completed");
+  const withdrawals = transactions.filter((t) => t.type === "withdrawal");
+  const pendingWithdrawals = withdrawals.filter((t) => t.status === "pending");
+  const purchases = transactions.filter((t) => t.type === "purchase");
+  const totalDeposits = sum(deposits);
+  const totalWithdrawn = sum(withdrawals.filter((t) => t.status === "completed" || t.status === "approved"));
+  const totalPendingOut = sum(pendingWithdrawals);
+  const totalAvailable = members.reduce((a, m) => a + Number(m.balance || 0), 0);
+  const totalBonus = members.reduce((a, m) => a + Number((m as Profile).bonus_balance || 0), 0);
+  const suspendedCount = members.filter((m) => m.is_suspended).length;
+  const startOfToday = new Date(new Date().toDateString()).getTime();
+  const newToday = members.filter((m) => new Date(m.created_at).getTime() >= startOfToday).length;
+  const depositsToday = sum(deposits.filter((t) => new Date(t.created_at).getTime() >= startOfToday));
+  const recentActivity = transactions.slice(0, 8);
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Admin Header */}
@@ -430,41 +446,12 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Users className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{members.length}</p>
-              <p className="text-xs text-muted-foreground">Members</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Receipt className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{transactions.length}</p>
-              <p className="text-xs text-muted-foreground">Transactions</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <Package className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{products.length}</p>
-              <p className="text-xs text-muted-foreground">Products</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gold/10 bg-card">
-            <CardContent className="p-4 text-center">
-              <CreditCard className="mx-auto text-gold mb-2" size={24} />
-              <p className="text-2xl font-bold text-foreground">{paymentMethods.length}</p>
-              <p className="text-xs text-muted-foreground">Payment Methods</p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Tabs */}
-        <Tabs defaultValue="members" className="w-full">
-          <TabsList className="w-full bg-card border border-gold/10 mb-6">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="w-full bg-card border border-gold/10 mb-6 flex-wrap h-auto">
+            <TabsTrigger value="overview" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
+              <LayoutDashboard size={14} className="mr-1.5" /> Overview
+            </TabsTrigger>
             <TabsTrigger value="members" className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-primary-foreground">
               <Users size={14} className="mr-1.5" /> Members
             </TabsTrigger>
@@ -486,6 +473,114 @@ const Admin = () => {
               )}
             </TabsTrigger>
           </TabsList>
+
+          {/* OVERVIEW TAB */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <ArrowDownCircle size={16} className="text-green-500" />
+                    <span className="text-xs uppercase tracking-wider">Total Deposits</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalDeposits.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">₵{depositsToday.toFixed(2)} today</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <ArrowUpCircle size={16} className="text-destructive" />
+                    <span className="text-xs uppercase tracking-wider">Withdrawn</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalWithdrawn.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{withdrawals.length} requests total</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Clock size={16} className="text-gold" />
+                    <span className="text-xs uppercase tracking-wider">Pending Payouts</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{totalPendingOut.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{pendingWithdrawals.length} awaiting review</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                    <Wallet size={16} className="text-gold" />
+                    <span className="text-xs uppercase tracking-wider">Wallet Liability</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">₵{(totalAvailable + totalBonus).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ₵{totalAvailable.toFixed(2)} available · ₵{totalBonus.toFixed(2)} bonus
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <Users className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{members.length}</p>
+                  <p className="text-xs text-muted-foreground">Members · {newToday} new today</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <Package className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{purchases.length}</p>
+                  <p className="text-xs text-muted-foreground">Product purchases</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <MessageCircle className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{tickets.filter((t) => t.status === "open").length}</p>
+                  <p className="text-xs text-muted-foreground">Open support tickets</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gold/10 bg-card">
+                <CardContent className="p-4 text-center">
+                  <UserX className="mx-auto text-gold mb-2" size={22} />
+                  <p className="text-xl font-bold text-foreground">{suspendedCount}</p>
+                  <p className="text-xs text-muted-foreground">Suspended accounts</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-gold/10 bg-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-foreground text-base">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {recentActivity.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No activity yet.</p>
+                )}
+                {recentActivity.map((t) => (
+                  <div key={t.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background/60 border border-gold/10">
+                    <div className="min-w-0">
+                      <p className="text-sm text-foreground font-medium truncate">
+                        @{getMemberName(t.user_id)} · {t.type.replace(/_/g, " ")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(t.created_at).toLocaleString()}
+                        {t.network_provider ? ` · ${t.network_provider}` : ""}
+                        {t.phone_number ? ` · ${t.phone_number}` : ""}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-foreground">₵{Number(t.amount).toFixed(2)}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* MEMBERS TAB */}
           <TabsContent value="members">
