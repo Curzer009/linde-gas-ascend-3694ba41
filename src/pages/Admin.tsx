@@ -356,6 +356,22 @@ const Admin = () => {
     return m ? m.username : userId.slice(0, 8);
   };
 
+  const sum = (list: Transaction[]) => list.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const deposits = transactions.filter((t) => t.type === "deposit" && t.status === "completed");
+  const withdrawals = transactions.filter((t) => t.type === "withdrawal");
+  const pendingWithdrawals = withdrawals.filter((t) => t.status === "pending");
+  const purchases = transactions.filter((t) => t.type === "purchase");
+  const totalDeposits = sum(deposits);
+  const totalWithdrawn = sum(withdrawals.filter((t) => t.status === "completed" || t.status === "approved"));
+  const totalPendingOut = sum(pendingWithdrawals);
+  const totalAvailable = members.reduce((a, m) => a + Number(m.balance || 0), 0);
+  const totalBonus = members.reduce((a, m) => a + Number((m as Profile).bonus_balance || 0), 0);
+  const suspendedCount = members.filter((m) => m.is_suspended).length;
+  const startOfToday = new Date(new Date().toDateString()).getTime();
+  const newToday = members.filter((m) => new Date(m.created_at).getTime() >= startOfToday).length;
+  const depositsToday = sum(deposits.filter((t) => new Date(t.created_at).getTime() >= startOfToday));
+  const recentActivity = transactions.slice(0, 8);
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Admin Header */}
