@@ -712,6 +712,7 @@ const Admin = () => {
                       <TableHead>Amount</TableHead>
                       <TableHead>Mobile Money</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Transaction ID</TableHead>
                       <TableHead>Reference</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
@@ -746,6 +747,23 @@ const Admin = () => {
                             {t.status}
                           </span>
                         </TableCell>
+                        <TableCell className="text-xs">
+                          {t.type === "deposit" ? (
+                            t.txid ? (
+                              <div className="space-y-0.5">
+                                <p className="font-mono text-foreground break-all">{t.txid}</p>
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                                  {t.currency || "GHS"}
+                                  {t.verified_at ? " · verified" : " · unverified"}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-destructive">Missing</span>
+                            )
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-muted-foreground text-xs">{t.reference || "—"}</TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {new Date(t.created_at).toLocaleDateString()}
@@ -753,12 +771,37 @@ const Admin = () => {
                         <TableCell>
                           {t.status === "pending" && (
                             <div className="flex gap-2">
-                              <Button size="sm" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={() => updateTransactionStatus(t.id, "approved")}>
-                                Approve
-                              </Button>
-                              <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => updateTransactionStatus(t.id, "rejected")}>
-                                Reject
-                              </Button>
+                              {t.type === "deposit" ? (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                                    disabled={settlingDepositId === t.id || !t.txid}
+                                    title={!t.txid ? "Transaction ID is required." : "Verify with the payment provider and credit"}
+                                    onClick={() => settleDeposit(t, true)}
+                                  >
+                                    {settlingDepositId === t.id ? "Verifying…" : "Verify & Approve"}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="h-7 text-xs"
+                                    disabled={settlingDepositId === t.id}
+                                    onClick={() => settleDeposit(t, false)}
+                                  >
+                                    Reject
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button size="sm" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={() => updateTransactionStatus(t.id, "approved")}>
+                                    Approve
+                                  </Button>
+                                  <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => updateTransactionStatus(t.id, "rejected")}>
+                                    Reject
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           )}
                         </TableCell>
@@ -766,7 +809,7 @@ const Admin = () => {
                     ))}
                     {transactions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
+                        <TableCell colSpan={9} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
