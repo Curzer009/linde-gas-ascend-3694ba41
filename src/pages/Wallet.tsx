@@ -30,6 +30,9 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [amount, setAmount] = useState("");
+  const [txid, setTxid] = useState("");
+  const [depositAccount, setDepositAccount] = useState("");
+  const [submittingTxid, setSubmittingTxid] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [networkProvider, setNetworkProvider] = useState<"MTN" | "TELECEL" | "AIRTELTIGO">("MTN");
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw" | "transactions">("deposit");
@@ -176,6 +179,53 @@ const Wallet = () => {
       setLoading(false);
     }
   };
+
+  const handleSubmitTxid = async () => {
+    const val = parseFloat(amount);
+    if (!val || val <= 0) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    if (!txid.trim()) {
+      toast({ title: "Transaction ID is required.", variant: "destructive" });
+      return;
+    }
+
+    setSubmittingTxid(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-deposit", {
+        body: {
+          amount: val,
+          txid: txid.trim(),
+          currency: "GHS",
+          deposit_account: depositAccount.trim() || null,
+        },
+      });
+      if (error) {
+        let message = error.message;
+        try {
+          const ctx = (error as any).context;
+          if (ctx?.json) message = (await ctx.json())?.error || message;
+        } catch { /* ignore */ }
+        throw new Error(message);
+      }
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: "Transaction ID submitted",
+        description: "Your deposit is pending verification. Your balance updates once it is confirmed.",
+      });
+      setTxid("");
+      setDepositAccount("");
+      setAmount("");
+      fetchTransactions();
+    } catch (err: any) {
+      toast({ title: "Submission failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSubmittingTxid(false);
+    }
+  };
+
 
   const MIN_WITHDRAWAL = 20;
 

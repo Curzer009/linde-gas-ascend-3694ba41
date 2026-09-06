@@ -31,6 +31,10 @@ interface Transaction {
   amount: number;
   status: string;
   reference: string | null;
+  txid: string | null;
+  currency: string | null;
+  deposit_account: string | null;
+  verified_at: string | null;
   notes: string | null;
   phone_number: string | null;
   network_provider: string | null;
@@ -344,6 +348,46 @@ const Admin = () => {
       fetchAll();
     }
   };
+
+  // DEPOSITS: approval always goes through server-side TXID verification
+  const [settlingDepositId, setSettlingDepositId] = useState<string | null>(null);
+
+  const settleDeposit = async (t: Transaction, approve: boolean) => {
+    if (approve && (!t.txid || !t.txid.trim())) {
+      toast({ title: "Transaction ID is required.", variant: "destructive" });
+      return;
+    }
+    setSettlingDepositId(t.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-settle-deposit", {
+        body: { transaction_id: t.id, approve },
+      });
+      if (error) {
+        // Surface the backend's message (e.g. "Transaction could not be verified.")
+        let message = error.message;
+        try {
+          const ctx = (error as any).context;
+          if (ctx?.json) message = (await ctx.json())?.error || message;
+        } catch { /* ignore */ }
+        throw new Error(message);
+      }
+      if (data?.error) throw new Error(data.error);
+
+      if (!approve) {
+        toast({ title: "Deposit rejected" });
+      } else if (data?.status === "already_approved") {
+        toast({ title: "Deposit was already approved" });
+      } else {
+        toast({ title: "Deposit verified and credited" });
+      }
+      fetchAll();
+    } catch (err: any) {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSettlingDepositId(null);
+    }
+  };
+
 
   const filteredMembers = members.filter(
     (m) =>
@@ -668,6 +712,7 @@ const Admin = () => {
                       <TableHead>Amount</TableHead>
                       <TableHead>Mobile Money</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Transaction ID</TableHead>
                       <TableHead>Reference</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
@@ -702,6 +747,23 @@ const Admin = () => {
                             {t.status}
                           </span>
                         </TableCell>
+                        <TableCell className="text-xs">
+                          {t.type === "deposit" ? (
+                            t.txid ? (
+                              <div className="space-y-0.5">
+                                <p className="font-mono text-foreground break-all">{t.txid}</p>
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                                  {t.currency || "GHS"}
+                                  {t.verified_at ? " · verified" : " · unverified"}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-destructive">Missing</span>
+                            )
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-muted-foreground text-xs">{t.reference || "—"}</TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {new Date(t.created_at).toLocaleDateString()}
@@ -709,12 +771,37 @@ const Admin = () => {
                         <TableCell>
                           {t.status === "pending" && (
                             <div className="flex gap-2">
-                              <Button size="sm" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={() => updateTransactionStatus(t.id, "approved")}>
-                                Approve
-                              </Button>
-                              <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => updateTransactionStatus(t.id, "rejected")}>
-                                Reject
-                              </Button>
+                              {t.type === "deposit" ? (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                                    disabled={settlingDepositId === t.id || !t.txid}
+                                    title={!t.txid ? "Transaction ID is required." : "Verify with the payment provider and credit"}
+                                    onClick={() => settleDeposit(t, true)}
+                                  >
+                                    {settlingDepositId === t.id ? "Verifying…" : "Verify & Approve"}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="h-7 text-xs"
+                                    disabled={settlingDepositId === t.id}
+                                    onClick={() => settleDeposit(t, false)}
+                                  >
+                                    Reject
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button size="sm" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={() => updateTransactionStatus(t.id, "approved")}>
+                                    Approve
+                                  </Button>
+                                  <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => updateTransactionStatus(t.id, "rejected")}>
+                                    Reject
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           )}
                         </TableCell>
@@ -722,7 +809,7 @@ const Admin = () => {
                     ))}
                     {transactions.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
+                        <TableCell colSpan={9} className="text-center text-muted-foreground py-8">No transactions yet</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
