@@ -255,41 +255,56 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          currency: string
+          deposit_account: string | null
           id: string
           network_provider: string | null
           notes: string | null
           phone_number: string | null
           reference: string | null
           status: string
+          txid: string | null
           type: string
           updated_at: string
           user_id: string
+          verification_data: Json | null
+          verified_at: string | null
         }
         Insert: {
           amount: number
           created_at?: string
+          currency?: string
+          deposit_account?: string | null
           id?: string
           network_provider?: string | null
           notes?: string | null
           phone_number?: string | null
           reference?: string | null
           status?: string
+          txid?: string | null
           type: string
           updated_at?: string
           user_id: string
+          verification_data?: Json | null
+          verified_at?: string | null
         }
         Update: {
           amount?: number
           created_at?: string
+          currency?: string
+          deposit_account?: string | null
           id?: string
           network_provider?: string | null
           notes?: string | null
           phone_number?: string | null
           reference?: string | null
           status?: string
+          txid?: string | null
           type?: string
           updated_at?: string
           user_id?: string
+          verification_data?: Json | null
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -316,6 +331,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_approve_deposit: {
+        Args: {
+          p_admin_id: string
+          p_transaction_id: string
+          p_verification: Json
+        }
+        Returns: {
+          bonus_balance: number
+          credited: boolean
+        }[]
+      }
       admin_credit_wallet: {
         Args: {
           p_account: string
@@ -328,6 +354,14 @@ export type Database = {
           balance: number
           bonus_balance: number
         }[]
+      }
+      admin_reject_deposit: {
+        Args: {
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: boolean
       }
       admin_set_suspension: {
         Args: { p_admin_id: string; p_suspended: boolean; p_user_id: string }
