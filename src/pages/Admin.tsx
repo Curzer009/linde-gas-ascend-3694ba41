@@ -31,6 +31,10 @@ interface Transaction {
   amount: number;
   status: string;
   reference: string | null;
+  txid: string | null;
+  currency: string | null;
+  deposit_account: string | null;
+  verified_at: string | null;
   notes: string | null;
   phone_number: string | null;
   network_provider: string | null;
@@ -344,6 +348,46 @@ const Admin = () => {
       fetchAll();
     }
   };
+
+  // DEPOSITS: approval always goes through server-side TXID verification
+  const [settlingDepositId, setSettlingDepositId] = useState<string | null>(null);
+
+  const settleDeposit = async (t: Transaction, approve: boolean) => {
+    if (approve && (!t.txid || !t.txid.trim())) {
+      toast({ title: "Transaction ID is required.", variant: "destructive" });
+      return;
+    }
+    setSettlingDepositId(t.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-settle-deposit", {
+        body: { transaction_id: t.id, approve },
+      });
+      if (error) {
+        // Surface the backend's message (e.g. "Transaction could not be verified.")
+        let message = error.message;
+        try {
+          const ctx = (error as any).context;
+          if (ctx?.json) message = (await ctx.json())?.error || message;
+        } catch { /* ignore */ }
+        throw new Error(message);
+      }
+      if (data?.error) throw new Error(data.error);
+
+      if (!approve) {
+        toast({ title: "Deposit rejected" });
+      } else if (data?.status === "already_approved") {
+        toast({ title: "Deposit was already approved" });
+      } else {
+        toast({ title: "Deposit verified and credited" });
+      }
+      fetchAll();
+    } catch (err: any) {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSettlingDepositId(null);
+    }
+  };
+
 
   const filteredMembers = members.filter(
     (m) =>
