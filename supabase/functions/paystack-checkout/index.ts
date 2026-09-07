@@ -82,6 +82,8 @@ Deno.serve(async (req) => {
           ...(callbackUrl ? { callback_url: callbackUrl } : {}),
           metadata: {
             user_id: userId,
+            net_amount: netAmount,
+            paystack_fee: Math.round((chargeAmount - netAmount) * 100) / 100,
             product_name: productName || "Investment",
             is_wallet_deposit: (productName || "").toLowerCase().includes("wallet"),
             display_name: "LINDE GAS",

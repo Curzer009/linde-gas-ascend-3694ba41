@@ -108,7 +108,9 @@ Deno.serve(async (req) => {
     }
 
     const tx = verifyData.data;
-    const amountInCedis = tx.amount / 100;
+    const amountInCedis = Number(tx.metadata?.net_amount) > 0
+      ? Number(tx.metadata.net_amount)
+      : tx.amount / 100;
     const metaUserId = tx.metadata?.user_id;
     const productName = tx.metadata?.product_name || "Investment";
     const isWalletDeposit =
