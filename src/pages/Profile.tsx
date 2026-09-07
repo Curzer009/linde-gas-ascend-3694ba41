@@ -127,63 +127,22 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Recovery info */}
-          <div className="bg-card rounded-3xl border border-gold/10 p-8 space-y-5">
-            <div>
-              <h3 className="font-serif text-lg font-bold text-foreground">Account Recovery</h3>
-              <p className="text-muted-foreground text-xs mt-1">
-                Add an email and phone number so you can reset your password if you lose access.
-              </p>
-            </div>
-
-            <div>
-              <label className="text-muted-foreground text-xs flex items-center gap-2 mb-2">
-                <Mail size={14} className="text-gold" /> Recovery Email
-                {hasRealEmail && <span className="text-gold text-[10px] uppercase tracking-wider">verified</span>}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="flex-1 px-3 py-2 rounded-lg bg-background border border-gold/10 text-sm text-foreground focus:outline-none focus:border-gold/30"
-                />
-                <button
-                  onClick={saveEmail}
-                  disabled={savingEmail}
-                  className="px-4 rounded-lg bg-gradient-gold text-primary-foreground text-sm font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
-                >
-                  <Save size={14} /> Save
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-muted-foreground text-xs flex items-center gap-2 mb-2">
-                <Phone size={14} className="text-gold" /> Phone Number
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+233 ..."
-                  className="flex-1 px-3 py-2 rounded-lg bg-background border border-gold/10 text-sm text-foreground focus:outline-none focus:border-gold/30"
-                />
-                <button
-                  onClick={savePhone}
-                  disabled={savingPhone}
-                  className="px-4 rounded-lg bg-gradient-gold text-primary-foreground text-sm font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
-                >
-                  <Save size={14} /> Save
-                </button>
-              </div>
-              <p className="text-muted-foreground/70 text-[11px] mt-2">
-                SMS one-time codes will be available soon. Add your number now to be ready.
-              </p>
-            </div>
+          {/* Help */}
+          <div className="bg-card rounded-3xl border border-gold/10 p-8 space-y-3 text-center">
+            <h3 className="font-serif text-lg font-bold text-foreground">Need Help?</h3>
+            <p className="text-muted-foreground text-sm">
+              Our support team can help with account access, deposits and withdrawals.
+            </p>
+            <a
+              href="https://t.me/lendgassupport"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-sm hover:opacity-90"
+            >
+              <Mail size={16} /> Contact @lendgassupport on Telegram
+            </a>
           </div>
+
         </div>
       </div>
     </div>
