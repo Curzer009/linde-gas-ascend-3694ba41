@@ -4,6 +4,7 @@ import { ArrowDownCircle, ArrowUpCircle, Wallet as WalletIcon, Loader2, ReceiptT
 import DashboardNav from "@/components/DashboardNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { grossUp, paystackFee } from "@/lib/paystackFee";
 import { useToast } from "@/hooks/use-toast";
 import mtnLogo from "@/assets/network-mtn.png";
 import telecelLogo from "@/assets/network-telecel.png";
@@ -410,6 +411,13 @@ const Wallet = () => {
                 ? "Recharge"
                 : "Request Withdrawal"}
             </button>
+            {activeTab === "deposit" && parseFloat(amount) > 0 && (
+              <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-xs text-foreground/80 space-y-1">
+                <div className="flex justify-between"><span>Recharge amount</span><span className="font-semibold">₵{parseFloat(amount).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Payment processing charge</span><span className="font-semibold">₵{paystackFee(parseFloat(amount)).toFixed(2)}</span></div>
+                <div className="flex justify-between border-t border-gold/20 pt-1"><span className="font-semibold text-gold">Total to pay</span><span className="font-bold text-gold">₵{grossUp(parseFloat(amount)).toFixed(2)}</span></div>
+              </div>
+            )}
             {activeTab === "withdraw" && (
               <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-xs text-foreground/80 space-y-1">
                 <p><span className="font-semibold text-gold">Minimum withdrawal:</span> ₵{MIN_WITHDRAWAL}.00</p>
