@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Bot } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +26,7 @@ const SupportBot = ({ variant = "floating" }: SupportBotProps) => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const seenIds = useRef<Set<string>>(new Set());
 
   const loadTickets = async () => {
     if (!user) return;
@@ -33,8 +34,20 @@ const SupportBot = ({ variant = "floating" }: SupportBotProps) => {
       .from("support_tickets")
       .select("*")
       .eq("user_id", user.id)
+      .not("admin_reply", "is", null)
       .order("created_at", { ascending: false });
-    if (data) setTickets(data as Ticket[]);
+    if (!data || data.length === 0) return;
+
+    const fresh = (data as Ticket[]).filter((t) => !seenIds.current.has(t.id));
+    if (fresh.length === 0) return;
+
+    fresh.forEach((t) => seenIds.current.add(t.id));
+    // Show only new replies, then clear them so old chats never reappear.
+    setTickets(fresh);
+    await supabase
+      .from("support_tickets")
+      .delete()
+      .in("id", fresh.map((t) => t.id));
   };
 
   useEffect(() => {
@@ -73,7 +86,7 @@ const SupportBot = ({ variant = "floating" }: SupportBotProps) => {
       toast({ title: "Failed to send", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Report sent! Admin will reply shortly." });
+    toast({ title: "Report sent! Support will reply shortly." });
     setSubject("");
     setMessage("");
     loadTickets();
