@@ -57,7 +57,9 @@ Deno.serve(async (req) => {
     if (event.event === "charge.success") {
       const reference = event.data.reference;
       const amountInPesewas = event.data.amount;
-      const amountInCedis = amountInPesewas / 100;
+      const amountInCedis = Number(event.data.metadata?.net_amount) > 0
+        ? Number(event.data.metadata.net_amount)
+        : amountInPesewas / 100;
       const productName = event.data.metadata?.product_name || "Investment";
       const userId = event.data.metadata?.user_id;
 

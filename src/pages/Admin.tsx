@@ -158,6 +158,8 @@ const Admin = () => {
   const [creditAccount, setCreditAccount] = useState<"available" | "bonus">("bonus");
   const [creditNotes, setCreditNotes] = useState("");
   const [crediting, setCrediting] = useState(false);
+  const [deleteMember, setDeleteMember] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -236,6 +238,27 @@ const Admin = () => {
       setEditMember(null);
       fetchAll();
     }
+  };
+
+  const confirmDeleteMember = async () => {
+    if (!deleteMember) return;
+    setDeleting(true);
+    const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+      body: { user_id: deleteMember.user_id },
+    });
+    setDeleting(false);
+    if (error || (data as any)?.error) {
+      let message = error?.message || (data as any)?.error;
+      try {
+        const ctx = (error as any)?.context;
+        if (ctx?.json) message = (await ctx.json())?.error || message;
+      } catch { /* ignore */ }
+      toast({ title: "Delete failed", description: message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Account @${deleteMember.username} deleted` });
+    setDeleteMember(null);
+    fetchAll();
   };
 
   const submitCredit = async () => {
@@ -687,6 +710,14 @@ const Admin = () => {
                             >
                               {m.is_suspended ? "Unsuspend" : "Suspend"}
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 text-xs"
+                              onClick={() => setDeleteMember(m)}
+                            >
+                              Delete
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -978,6 +1009,25 @@ const Admin = () => {
       </div>
 
       {/* CREDIT MEMBER DIALOG */}
+      <Dialog open={!!deleteMember} onOpenChange={(o) => !o && setDeleteMember(null)}>
+        <DialogContent className="bg-card border-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              Delete {deleteMember ? `@${deleteMember.username}` : "account"}?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This permanently removes the account, its wallet balances, transactions and support messages. This cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" className="border-gold/20" onClick={() => setDeleteMember(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDeleteMember} disabled={deleting}>
+              {deleting ? "Deleting..." : "Delete Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!creditMember} onOpenChange={(o) => !o && setCreditMember(null)}>
         <DialogContent className="bg-card border-gold/10">
           <DialogHeader>

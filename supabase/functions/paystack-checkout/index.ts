@@ -49,7 +49,12 @@ Deno.serve(async (req) => {
     }
 
     const reference = `ps_${userId}_${Date.now()}`;
-    const amountInPesewas = Math.round(amount * 100);
+    // Gross up so Paystack's processing fee is paid by the customer and the
+    // business receives the exact requested amount.
+    const PAYSTACK_RATE = 0.0195;
+    const netAmount = Math.round(amount * 100) / 100;
+    const chargeAmount = Math.ceil((netAmount / (1 - PAYSTACK_RATE)) * 100) / 100;
+    const amountInPesewas = Math.round(chargeAmount * 100);
 
     // Determine callback URL from request origin so Paystack redirects back to /wallet
     const requestOrigin = req.headers.get("origin");
@@ -77,6 +82,8 @@ Deno.serve(async (req) => {
           ...(callbackUrl ? { callback_url: callbackUrl } : {}),
           metadata: {
             user_id: userId,
+            net_amount: netAmount,
+            paystack_fee: Math.round((chargeAmount - netAmount) * 100) / 100,
             product_name: productName || "Investment",
             is_wallet_deposit: (productName || "").toLowerCase().includes("wallet"),
             display_name: "LINDE GAS",
