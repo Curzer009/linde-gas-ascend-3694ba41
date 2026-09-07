@@ -95,10 +95,16 @@ const Login = () => {
           </button>
 
           <div className="text-center">
-            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-gold">
-              Forgot password?
-            </Link>
+            <a
+              href="https://t.me/lendgassupport"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-gold"
+            >
+              Need help? Contact @lendgassupport on Telegram
+            </a>
           </div>
+
 
           <p className="text-center text-muted-foreground text-sm">
             Don't have an account?{" "}
