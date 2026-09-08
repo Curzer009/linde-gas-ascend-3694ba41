@@ -156,6 +156,20 @@ Deno.serve(async (req) => {
     }).select().single();
 
     if (error) {
+      // Roll back the held funds if the request row could not be created.
+      if (type === "withdrawal") {
+        const { data: p } = await supabaseAdmin
+          .from("profiles")
+          .select("balance")
+          .eq("user_id", user.id)
+          .single();
+        if (p) {
+          await supabaseAdmin
+            .from("profiles")
+            .update({ balance: Number(p.balance) + parsedAmount })
+            .eq("user_id", user.id);
+        }
+      }
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
