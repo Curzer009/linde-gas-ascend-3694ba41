@@ -728,6 +728,9 @@ const Admin = () => {
                             <Button size="sm" className="h-7 text-xs bg-gradient-gold text-primary-foreground hover:opacity-90" onClick={() => { setCreditMember(m); setCreditAccount("bonus"); }}>
                               Credit
                             </Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => { setPrizeMember(m); setPrizeAmount(""); setPrizeNote(""); setIssuedCode(""); }}>
+                              Prize Code
+                            </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => setEditMember({ ...m })}>
                               Edit
                             </Button>
