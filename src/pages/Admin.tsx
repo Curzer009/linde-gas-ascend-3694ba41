@@ -1118,6 +1118,53 @@ const Admin = () => {
         </DialogContent>
       </Dialog>
 
+      {/* REFERRAL PRIZE CODE DIALOG */}
+      <Dialog open={!!prizeMember} onOpenChange={(o) => !o && setPrizeMember(null)}>
+        <DialogContent className="bg-card border-gold/10">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              Referral prize code {prizeMember ? `for @${prizeMember.username}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Prize amount (₵)</label>
+              <Input
+                type="number"
+                value={prizeAmount}
+                onChange={(e) => setPrizeAmount(e.target.value)}
+                placeholder="0.00"
+                className="bg-secondary border-gold/10"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Note (optional)</label>
+              <Input
+                value={prizeNote}
+                onChange={(e) => setPrizeNote(e.target.value)}
+                placeholder="e.g. 5 referrals milestone"
+                className="bg-secondary border-gold/10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The code can be claimed once, only by this member, and pays into their available (withdrawable) balance.
+            </p>
+            {issuedCode && (
+              <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Give this code to the member</p>
+                <p className="font-mono text-lg font-bold text-gold tracking-widest">{issuedCode}</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPrizeMember(null)} className="border-gold/20">Close</Button>
+            <Button className="bg-gradient-gold text-primary-foreground" onClick={submitPrizeCode} disabled={issuingPrize}>
+              {issuingPrize ? "Creating..." : "Generate Code"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* EDIT MEMBER DIALOG */}
       <Dialog open={!!editMember} onOpenChange={() => setEditMember(null)}>
         <DialogContent className="bg-card border-gold/10">
