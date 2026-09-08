@@ -164,6 +164,50 @@ const Referrals = () => {
           </div>
         </div>
 
+        {/* Claim Prize */}
+        <div className="bg-card rounded-2xl border border-gold/10 p-6 mb-8">
+          <h2 className="font-serif text-lg font-bold text-foreground mb-1">Claim Your Prize</h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Enter the unique claim code issued to you by an administrator. Each code works once and pays
+            straight into your available balance (₵{availableBalance.toFixed(2)}), ready for withdrawal.
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={claimInput}
+              onChange={(e) => setClaimInput(e.target.value.toUpperCase())}
+              placeholder="REF-XXXXXXXX"
+              className="flex-1 px-4 py-3 rounded-xl bg-background border border-gold/10 text-foreground text-sm tracking-widest uppercase placeholder:text-muted-foreground focus:outline-none focus:border-gold/30"
+            />
+            <button
+              onClick={handleClaim}
+              disabled={claiming}
+              className="px-5 py-3 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {claiming ? "Claiming..." : "Claim"}
+            </button>
+          </div>
+
+          {myCodes.length > 0 && (
+            <div className="mt-5 space-y-2">
+              {myCodes.map((c) => (
+                <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-gold/5 bg-background/40 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="font-mono text-sm text-foreground tracking-wider">{c.code}</p>
+                    <p className="text-xs text-muted-foreground truncate">{c.note || "Referral prize"}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-gold font-bold text-sm">₵{Number(c.amount).toFixed(2)}</p>
+                    <p className={`text-xs ${c.claimed_at ? "text-green-500" : "text-amber-500"}`}>
+                      {c.claimed_at ? "Claimed" : "Unclaimed"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+
         {/* Reward Tiers */}
         <div className="bg-card rounded-2xl border border-gold/10 p-6 mb-8">
           <h2 className="font-serif text-lg font-bold text-foreground mb-4">Reward Tiers</h2>
