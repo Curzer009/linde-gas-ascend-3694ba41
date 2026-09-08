@@ -182,6 +182,45 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_reward_codes: {
+        Row: {
+          amount: number
+          assigned_to: string
+          claimed_at: string | null
+          claimed_by: string | null
+          code: string
+          created_at: string
+          id: string
+          issued_by: string
+          note: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          assigned_to: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          issued_by: string
+          note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          assigned_to?: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          issued_by?: string
+          note?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string
@@ -342,6 +381,17 @@ export type Database = {
           credited: boolean
         }[]
       }
+      admin_create_referral_code: {
+        Args: {
+          p_admin_id: string
+          p_amount: number
+          p_note?: string
+          p_user_id: string
+        }
+        Returns: {
+          code: string
+        }[]
+      }
       admin_credit_wallet: {
         Args: {
           p_account: string
@@ -377,6 +427,13 @@ export type Database = {
         Returns: {
           refunded: number
           status: string
+        }[]
+      }
+      claim_referral_code: {
+        Args: { p_code: string }
+        Returns: {
+          amount: number
+          balance: number
         }[]
       }
       has_role: {
