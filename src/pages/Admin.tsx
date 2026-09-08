@@ -158,6 +158,11 @@ const Admin = () => {
   const [creditAccount, setCreditAccount] = useState<"available" | "bonus">("bonus");
   const [creditNotes, setCreditNotes] = useState("");
   const [crediting, setCrediting] = useState(false);
+  const [prizeMember, setPrizeMember] = useState<Profile | null>(null);
+  const [prizeAmount, setPrizeAmount] = useState("");
+  const [prizeNote, setPrizeNote] = useState("");
+  const [issuingPrize, setIssuingPrize] = useState(false);
+  const [issuedCode, setIssuedCode] = useState("");
   const [deleteMember, setDeleteMember] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
 
