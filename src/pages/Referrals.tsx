@@ -22,6 +22,15 @@ const REWARD_MAP: Record<number, number> = {
   900: 45,
 };
 
+interface ClaimCode {
+  id: string;
+  code: string;
+  amount: number;
+  note: string | null;
+  claimed_at: string | null;
+  created_at: string;
+}
+
 const Referrals = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -29,33 +38,66 @@ const Referrals = () => {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [totalEarned, setTotalEarned] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [claimInput, setClaimInput] = useState("");
+  const [claiming, setClaiming] = useState(false);
+  const [myCodes, setMyCodes] = useState<ClaimCode[]>([]);
+  const [availableBalance, setAvailableBalance] = useState(0);
+
+  const fetchData = async () => {
+    if (!user) return;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("referral_code, balance")
+      .eq("user_id", user.id)
+      .single();
+
+    if (profile?.referral_code) setReferralCode(profile.referral_code);
+    if (profile) setAvailableBalance(Number((profile as any).balance || 0));
+
+    const { data: refs } = await supabase
+      .from("referrals")
+      .select("*")
+      .eq("referrer_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (refs) {
+      setReferrals(refs);
+      setTotalEarned(refs.filter(r => r.status === "paid").reduce((s, r) => s + Number(r.reward_amount), 0));
+    }
+
+    const { data: codes } = await supabase
+      .from("referral_reward_codes" as any)
+      .select("id, code, amount, note, claimed_at, created_at")
+      .order("created_at", { ascending: false });
+    if (codes) setMyCodes(codes as unknown as ClaimCode[]);
+  };
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchData = async () => {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("referral_code")
-        .eq("user_id", user.id)
-        .single();
-
-      if (profile?.referral_code) setReferralCode(profile.referral_code);
-
-      const { data: refs } = await supabase
-        .from("referrals")
-        .select("*")
-        .eq("referrer_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (refs) {
-        setReferrals(refs);
-        setTotalEarned(refs.filter(r => r.status === "paid").reduce((s, r) => s + Number(r.reward_amount), 0));
-      }
-    };
-
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const handleClaim = async () => {
+    const code = claimInput.trim();
+    if (!code) {
+      toast({ title: "Claim code is required.", variant: "destructive" });
+      return;
+    }
+    setClaiming(true);
+    const { data, error } = await supabase.rpc("claim_referral_code" as any, { p_code: code });
+    setClaiming(false);
+    if (error) {
+      toast({ title: "Claim failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+    toast({
+      title: `₵${Number(row?.amount || 0).toFixed(2)} added to your available balance`,
+      description: "You can withdraw this prize from your wallet.",
+    });
+    setClaimInput("");
+    fetchData();
+  };
 
   const referralLink = `${window.location.origin}/signup?ref=${referralCode}`;
 
