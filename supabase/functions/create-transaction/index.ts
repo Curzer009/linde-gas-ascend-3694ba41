@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     if (type === "withdrawal" || type === "purchase") {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
-        .select("balance, bonus_balance")
+        .select("balance, bonus_balance, is_suspended")
         .eq("user_id", user.id)
         .single();
 
@@ -89,12 +89,37 @@ Deno.serve(async (req) => {
         );
       }
 
+      if (profile.is_suspended) {
+        return new Response(
+          JSON.stringify({ error: "Your account is suspended. Please contact support." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       if (type === "withdrawal") {
+        if (parsedAmount < 20) {
+          return new Response(
+            JSON.stringify({ error: "Minimum withdrawal is ₵20" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
         if (Number(profile.balance) < parsedAmount) {
           return new Response(
             JSON.stringify({ error: "Insufficient available balance" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
+        }
+        // Hold the funds immediately so the available balance reflects the request.
+        const { error: holdErr } = await supabaseAdmin
+          .from("profiles")
+          .update({ balance: Number(profile.balance) - parsedAmount })
+          .eq("user_id", user.id)
+          .gte("balance", parsedAmount);
+        if (holdErr) {
+          return new Response(JSON.stringify({ error: holdErr.message }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
         }
       }
 
@@ -131,6 +156,20 @@ Deno.serve(async (req) => {
     }).select().single();
 
     if (error) {
+      // Roll back the held funds if the request row could not be created.
+      if (type === "withdrawal") {
+        const { data: p } = await supabaseAdmin
+          .from("profiles")
+          .select("balance")
+          .eq("user_id", user.id)
+          .single();
+        if (p) {
+          await supabaseAdmin
+            .from("profiles")
+            .update({ balance: Number(p.balance) + parsedAmount })
+            .eq("user_id", user.id);
+        }
+      }
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

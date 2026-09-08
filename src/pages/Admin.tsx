@@ -158,6 +158,11 @@ const Admin = () => {
   const [creditAccount, setCreditAccount] = useState<"available" | "bonus">("bonus");
   const [creditNotes, setCreditNotes] = useState("");
   const [crediting, setCrediting] = useState(false);
+  const [prizeMember, setPrizeMember] = useState<Profile | null>(null);
+  const [prizeAmount, setPrizeAmount] = useState("");
+  const [prizeNote, setPrizeNote] = useState("");
+  const [issuingPrize, setIssuingPrize] = useState(false);
+  const [issuedCode, setIssuedCode] = useState("");
   const [deleteMember, setDeleteMember] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -290,6 +295,30 @@ const Admin = () => {
     setCreditNotes("");
     setCreditAccount("bonus");
     fetchAll();
+  };
+
+  const submitPrizeCode = async () => {
+    if (!prizeMember || !user) return;
+    const amt = parseFloat(prizeAmount);
+    if (!amt || amt <= 0) {
+      toast({ title: "Enter a valid prize amount", variant: "destructive" });
+      return;
+    }
+    setIssuingPrize(true);
+    const { data, error } = await supabase.rpc("admin_create_referral_code" as any, {
+      p_admin_id: user.id,
+      p_user_id: prizeMember.user_id,
+      p_amount: amt,
+      p_note: prizeNote || null,
+    });
+    setIssuingPrize(false);
+    if (error) {
+      toast({ title: "Could not create code", description: error.message, variant: "destructive" });
+      return;
+    }
+    const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+    setIssuedCode(row?.code || "");
+    toast({ title: `Prize code created for @${prizeMember.username}` });
   };
 
   // PRODUCTS
@@ -699,6 +728,9 @@ const Admin = () => {
                             <Button size="sm" className="h-7 text-xs bg-gradient-gold text-primary-foreground hover:opacity-90" onClick={() => { setCreditMember(m); setCreditAccount("bonus"); }}>
                               Credit
                             </Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => { setPrizeMember(m); setPrizeAmount(""); setPrizeNote(""); setIssuedCode(""); }}>
+                              Prize Code
+                            </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs border-gold/20 hover:bg-gold/10" onClick={() => setEditMember({ ...m })}>
                               Edit
                             </Button>
@@ -1081,6 +1113,53 @@ const Admin = () => {
             <Button variant="outline" onClick={() => setCreditMember(null)} className="border-gold/20">Cancel</Button>
             <Button className="bg-gradient-gold text-primary-foreground" onClick={submitCredit} disabled={crediting}>
               {crediting ? "Crediting..." : "Credit Wallet"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* REFERRAL PRIZE CODE DIALOG */}
+      <Dialog open={!!prizeMember} onOpenChange={(o) => !o && setPrizeMember(null)}>
+        <DialogContent className="bg-card border-gold/10">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              Referral prize code {prizeMember ? `for @${prizeMember.username}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Prize amount (₵)</label>
+              <Input
+                type="number"
+                value={prizeAmount}
+                onChange={(e) => setPrizeAmount(e.target.value)}
+                placeholder="0.00"
+                className="bg-secondary border-gold/10"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Note (optional)</label>
+              <Input
+                value={prizeNote}
+                onChange={(e) => setPrizeNote(e.target.value)}
+                placeholder="e.g. 5 referrals milestone"
+                className="bg-secondary border-gold/10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The code can be claimed once, only by this member, and pays into their available (withdrawable) balance.
+            </p>
+            {issuedCode && (
+              <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Give this code to the member</p>
+                <p className="font-mono text-lg font-bold text-gold tracking-widest">{issuedCode}</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPrizeMember(null)} className="border-gold/20">Close</Button>
+            <Button className="bg-gradient-gold text-primary-foreground" onClick={submitPrizeCode} disabled={issuingPrize}>
+              {issuingPrize ? "Creating..." : "Generate Code"}
             </Button>
           </DialogFooter>
         </DialogContent>
