@@ -292,6 +292,30 @@ const Admin = () => {
     fetchAll();
   };
 
+  const submitPrizeCode = async () => {
+    if (!prizeMember || !user) return;
+    const amt = parseFloat(prizeAmount);
+    if (!amt || amt <= 0) {
+      toast({ title: "Enter a valid prize amount", variant: "destructive" });
+      return;
+    }
+    setIssuingPrize(true);
+    const { data, error } = await supabase.rpc("admin_create_referral_code" as any, {
+      p_admin_id: user.id,
+      p_user_id: prizeMember.user_id,
+      p_amount: amt,
+      p_note: prizeNote || null,
+    });
+    setIssuingPrize(false);
+    if (error) {
+      toast({ title: "Could not create code", description: error.message, variant: "destructive" });
+      return;
+    }
+    const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+    setIssuedCode(row?.code || "");
+    toast({ title: `Prize code created for @${prizeMember.username}` });
+  };
+
   // PRODUCTS
   const saveProduct = async () => {
     if (!editProduct) return;
