@@ -707,7 +707,16 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-4 rounded-xl border border-gold/10 bg-background/50 p-3 text-xs text-muted-foreground space-y-1">
+                  <p className="font-semibold text-foreground">What each action does to the member's account</p>
+                  <p><span className="text-gold font-semibold">Credit</span> — adds money to their bonus (recharge) or available (withdrawable) wallet.</p>
+                  <p><span className="text-gold font-semibold">Prize Code</span> — issues a one-time referral claim code that pays into their available wallet.</p>
+                  <p><span className="text-gold font-semibold">Edit</span> — changes their name, username or available balance directly.</p>
+                  <p><span className="text-gold font-semibold">Suspend</span> — blocks withdrawals and product purchases; balances stay untouched.</p>
+                  <p><span className="text-gold font-semibold">Delete</span> — permanently removes the account, balances, transactions and messages.</p>
+                </div>
                 <Table>
+
                   <TableHeader>
                     <TableRow className="border-gold/10">
                       <TableHead>Name</TableHead>
