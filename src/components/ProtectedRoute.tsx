@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import SupportBot from "@/components/SupportBot";
+import OnboardingTour from "@/components/OnboardingTour";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -21,6 +22,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     <>
       {children}
       <SupportBot />
+      <OnboardingTour />
     </>
   );
 };

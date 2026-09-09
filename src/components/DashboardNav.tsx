@@ -26,11 +26,11 @@ const DashboardNav = () => {
   };
 
   const links = [
-    { to: "/products", label: "Products", icon: ShoppingBag },
-    { to: "/wallet", label: "Wallet", icon: Wallet },
-    { to: "/referrals", label: "Referrals", icon: Users },
-    { to: "/profile", label: "Profile", icon: User },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
+    { to: "/products", label: "Products", icon: ShoppingBag, tour: "products" },
+    { to: "/wallet", label: "Wallet", icon: Wallet, tour: "wallet" },
+    { to: "/referrals", label: "Referrals", icon: Users, tour: "referrals" },
+    { to: "/profile", label: "Profile", icon: User, tour: "profile" },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield, tour: "admin" }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -44,10 +44,11 @@ const DashboardNav = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
-          {links.map(({ to, label, icon: Icon }) => (
+          {links.map(({ to, label, icon: Icon, tour }) => (
             <Link
               key={to}
               to={to}
+              data-tour={tour}
               className={`flex items-center gap-2 text-sm font-medium transition-colors ${isActive(to) ? "text-gold" : "text-muted-foreground hover:text-gold"}`}
             >
               <Icon size={16} /> {label}
