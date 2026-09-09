@@ -1061,7 +1061,40 @@ const Admin = () => {
         </Tabs>
       </div>
 
-      {/* CREDIT MEMBER DIALOG */}
+      {/* SUSPEND CONFIRMATION */}
+      <Dialog open={!!suspendMember} onOpenChange={(o) => !o && setSuspendMember(null)}>
+        <DialogContent className="bg-card border-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              {suspendMember?.is_suspended ? "Unsuspend" : "Suspend"} {suspendMember ? `@${suspendMember.username}` : ""}?
+            </DialogTitle>
+          </DialogHeader>
+          {suspendMember && (
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                {suspendMember.is_suspended
+                  ? "They will be able to buy products and request withdrawals again."
+                  : "They will be blocked from requesting withdrawals and buying products until you unsuspend them."}
+              </p>
+              <p className="text-xs">
+                Balances are not changed — Available: <span className="text-gold">₵{Number(suspendMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(suspendMember.bonus_balance || 0).toFixed(2)}</span>
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" className="border-gold/20" onClick={() => setSuspendMember(null)}>Cancel</Button>
+            <Button
+              variant={suspendMember?.is_suspended ? "default" : "destructive"}
+              onClick={() => suspendMember && toggleSuspend(suspendMember)}
+            >
+              {suspendMember?.is_suspended ? "Unsuspend Account" : "Suspend Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE MEMBER DIALOG */}
+
       <Dialog open={!!deleteMember} onOpenChange={(o) => !o && setDeleteMember(null)}>
         <DialogContent className="bg-card border-gold/20">
           <DialogHeader>
