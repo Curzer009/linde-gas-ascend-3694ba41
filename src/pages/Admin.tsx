@@ -164,6 +164,8 @@ const Admin = () => {
   const [issuingPrize, setIssuingPrize] = useState(false);
   const [issuedCode, setIssuedCode] = useState("");
   const [deleteMember, setDeleteMember] = useState<Profile | null>(null);
+  const [suspendMember, setSuspendMember] = useState<Profile | null>(null);
+
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
