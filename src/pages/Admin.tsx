@@ -1158,9 +1158,23 @@ const Admin = () => {
                   className="bg-secondary border-gold/10"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Current — Available: <span className="text-gold">₵{Number(creditMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(creditMember.bonus_balance || 0).toFixed(2)}</span>
-              </p>
+              <div className="rounded-lg border border-gold/10 bg-background/50 p-3 text-xs text-muted-foreground space-y-1">
+                <p>
+                  Current — Available: <span className="text-gold">₵{Number(creditMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(creditMember.bonus_balance || 0).toFixed(2)}</span>
+                </p>
+                {Number(creditAmount) > 0 && (
+                  <p className="text-foreground">
+                    After this credit — {creditAccount === "available" ? "Available" : "Bonus"}:{" "}
+                    <span className="text-gold font-semibold">
+                      ₵{(Number(creditAccount === "available" ? creditMember.balance : creditMember.bonus_balance || 0) + Number(creditAmount)).toFixed(2)}
+                    </span>{" "}
+                    {creditAccount === "available"
+                      ? "(the member can withdraw this)"
+                      : "(usable for product recharges only)"}
+                  </p>
+                )}
+              </div>
+
             </div>
           )}
           <DialogFooter>
