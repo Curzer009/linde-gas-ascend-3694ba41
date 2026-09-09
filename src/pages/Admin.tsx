@@ -164,6 +164,8 @@ const Admin = () => {
   const [issuingPrize, setIssuingPrize] = useState(false);
   const [issuedCode, setIssuedCode] = useState("");
   const [deleteMember, setDeleteMember] = useState<Profile | null>(null);
+  const [suspendMember, setSuspendMember] = useState<Profile | null>(null);
+
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -221,10 +223,19 @@ const Admin = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: profile.is_suspended ? "User unsuspended" : "User suspended" });
+      toast({
+        title: profile.is_suspended
+          ? `@${profile.username} unsuspended`
+          : `@${profile.username} suspended`,
+        description: profile.is_suspended
+          ? "They can sign in, recharge, buy products and withdraw again."
+          : "They can no longer withdraw or buy products until unsuspended.",
+      });
       fetchAll();
+      setSuspendMember(null);
     }
   };
+
 
   const saveMember = async () => {
     if (!editMember) return;
@@ -696,7 +707,16 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-4 rounded-xl border border-gold/10 bg-background/50 p-3 text-xs text-muted-foreground space-y-1">
+                  <p className="font-semibold text-foreground">What each action does to the member's account</p>
+                  <p><span className="text-gold font-semibold">Credit</span> — adds money to their bonus (recharge) or available (withdrawable) wallet.</p>
+                  <p><span className="text-gold font-semibold">Prize Code</span> — issues a one-time referral claim code that pays into their available wallet.</p>
+                  <p><span className="text-gold font-semibold">Edit</span> — changes their name, username or available balance directly.</p>
+                  <p><span className="text-gold font-semibold">Suspend</span> — blocks withdrawals and product purchases; balances stay untouched.</p>
+                  <p><span className="text-gold font-semibold">Delete</span> — permanently removes the account, balances, transactions and messages.</p>
+                </div>
                 <Table>
+
                   <TableHeader>
                     <TableRow className="border-gold/10">
                       <TableHead>Name</TableHead>
@@ -738,10 +758,11 @@ const Admin = () => {
                               size="sm"
                               variant={m.is_suspended ? "default" : "destructive"}
                               className="h-7 text-xs"
-                              onClick={() => toggleSuspend(m)}
+                              onClick={() => setSuspendMember(m)}
                             >
                               {m.is_suspended ? "Unsuspend" : "Suspend"}
                             </Button>
+
                             <Button
                               size="sm"
                               variant="destructive"
@@ -1040,7 +1061,40 @@ const Admin = () => {
         </Tabs>
       </div>
 
-      {/* CREDIT MEMBER DIALOG */}
+      {/* SUSPEND CONFIRMATION */}
+      <Dialog open={!!suspendMember} onOpenChange={(o) => !o && setSuspendMember(null)}>
+        <DialogContent className="bg-card border-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              {suspendMember?.is_suspended ? "Unsuspend" : "Suspend"} {suspendMember ? `@${suspendMember.username}` : ""}?
+            </DialogTitle>
+          </DialogHeader>
+          {suspendMember && (
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                {suspendMember.is_suspended
+                  ? "They will be able to buy products and request withdrawals again."
+                  : "They will be blocked from requesting withdrawals and buying products until you unsuspend them."}
+              </p>
+              <p className="text-xs">
+                Balances are not changed — Available: <span className="text-gold">₵{Number(suspendMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(suspendMember.bonus_balance || 0).toFixed(2)}</span>
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" className="border-gold/20" onClick={() => setSuspendMember(null)}>Cancel</Button>
+            <Button
+              variant={suspendMember?.is_suspended ? "default" : "destructive"}
+              onClick={() => suspendMember && toggleSuspend(suspendMember)}
+            >
+              {suspendMember?.is_suspended ? "Unsuspend Account" : "Suspend Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE MEMBER DIALOG */}
+
       <Dialog open={!!deleteMember} onOpenChange={(o) => !o && setDeleteMember(null)}>
         <DialogContent className="bg-card border-gold/20">
           <DialogHeader>
@@ -1104,9 +1158,23 @@ const Admin = () => {
                   className="bg-secondary border-gold/10"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Current — Available: <span className="text-gold">₵{Number(creditMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(creditMember.bonus_balance || 0).toFixed(2)}</span>
-              </p>
+              <div className="rounded-lg border border-gold/10 bg-background/50 p-3 text-xs text-muted-foreground space-y-1">
+                <p>
+                  Current — Available: <span className="text-gold">₵{Number(creditMember.balance).toFixed(2)}</span> · Bonus: <span className="text-gold">₵{Number(creditMember.bonus_balance || 0).toFixed(2)}</span>
+                </p>
+                {Number(creditAmount) > 0 && (
+                  <p className="text-foreground">
+                    After this credit — {creditAccount === "available" ? "Available" : "Bonus"}:{" "}
+                    <span className="text-gold font-semibold">
+                      ₵{(Number(creditAccount === "available" ? creditMember.balance : creditMember.bonus_balance || 0) + Number(creditAmount)).toFixed(2)}
+                    </span>{" "}
+                    {creditAccount === "available"
+                      ? "(the member can withdraw this)"
+                      : "(usable for product recharges only)"}
+                  </p>
+                )}
+              </div>
+
             </div>
           )}
           <DialogFooter>
