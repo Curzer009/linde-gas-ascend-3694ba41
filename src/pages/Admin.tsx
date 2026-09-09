@@ -749,10 +749,11 @@ const Admin = () => {
                               size="sm"
                               variant={m.is_suspended ? "default" : "destructive"}
                               className="h-7 text-xs"
-                              onClick={() => toggleSuspend(m)}
+                              onClick={() => setSuspendMember(m)}
                             >
                               {m.is_suspended ? "Unsuspend" : "Suspend"}
                             </Button>
+
                             <Button
                               size="sm"
                               variant="destructive"
