@@ -221,10 +221,19 @@ const Admin = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: profile.is_suspended ? "User unsuspended" : "User suspended" });
+      toast({
+        title: profile.is_suspended
+          ? `@${profile.username} unsuspended`
+          : `@${profile.username} suspended`,
+        description: profile.is_suspended
+          ? "They can sign in, recharge, buy products and withdraw again."
+          : "They can no longer withdraw or buy products until unsuspended.",
+      });
       fetchAll();
+      setSuspendMember(null);
     }
   };
+
 
   const saveMember = async () => {
     if (!editMember) return;
