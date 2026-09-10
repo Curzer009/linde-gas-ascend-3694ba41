@@ -426,7 +426,7 @@ const Wallet = () => {
             )}
             <p className="text-muted-foreground text-xs text-center">
               {activeTab === "deposit"
-                ? "Deposits top up your bonus balance, used to recharge products. You'll be redirected to the LINDE GAS payment page to complete payment via Mobile Money."
+                ? "Deposits top up your bonus balance, used to recharge products. You'll be redirected to the AGRILINK payment page to complete payment via Mobile Money."
                 : "Withdrawals are processed within 24 hours."}
             </p>
           </div>
