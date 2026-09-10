@@ -12,7 +12,7 @@ type Step = {
 
 const STEPS: Step[] = [
   {
-    title: "Welcome to LINDE GAS",
+    title: "Welcome to AGRILINK",
     body: "Let's take a quick tour so you know exactly where everything is. It only takes a few seconds.",
     icon: Sparkles,
   },

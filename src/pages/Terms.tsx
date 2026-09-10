@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-const SITE = "[LINDE GAS]";
+const SITE = "[AGRILINK]";
 const LAST_UPDATED = "May 1, 2026";
 
 const sections = [

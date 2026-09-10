@@ -5,8 +5,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/page-bg.png" alt="LINDE GAS logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
-              <span className="font-serif text-xl font-bold text-gradient-gold">LINDE GAS</span>
+              <img src="/page-bg.png" alt="AGRILINK logo" className="w-10 h-10 rounded-full object-cover border border-gold/30" />
+              <span className="font-serif text-xl font-bold text-gradient-gold">AGRILINK</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Premium industrial products with guaranteed 2× returns over a 50-day generation period.
@@ -43,7 +43,7 @@ const Footer = () => {
             Terms and Conditions
           </a>
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} LINDE GAS. All rights reserved.
+            © {new Date().getFullYear()} AGRILINK. All rights reserved.
           </p>
         </div>
       </div>
