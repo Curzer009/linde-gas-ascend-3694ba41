@@ -50,7 +50,7 @@ const Login = () => {
     <div className="min-h-screen bg-transparent flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/page-bg.png" alt="AGRILINK logo" className="w-16 h-16 rounded-full object-cover border border-gold/30 mx-auto mb-4" />
+          <img src="/agrilink-mark.jpg" alt="AGRILINK logo" className="w-16 h-16 rounded-full object-cover border border-gold/30 mx-auto mb-4" />
           <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">Sign in to your AGRILINK account</p>
         </div>
