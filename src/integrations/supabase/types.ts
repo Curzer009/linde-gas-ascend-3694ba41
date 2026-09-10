@@ -443,6 +443,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      lookup_referrer: {
+        Args: { p_code: string }
+        Returns: {
+          full_name: string
+        }[]
+      }
       process_wallet_deposit: {
         Args: {
           p_amount: number
@@ -455,6 +461,7 @@ export type Database = {
           credited: boolean
         }[]
       }
+      register_referral: { Args: { p_code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
