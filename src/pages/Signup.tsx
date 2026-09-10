@@ -19,12 +19,9 @@ const Signup = () => {
   useEffect(() => {
     if (!refCode) return;
     const lookup = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("referral_code", refCode)
-        .single();
-      if (data) setReferrerName(data.full_name);
+      const { data } = await supabase.rpc("lookup_referrer" as any, { p_code: refCode });
+      const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+      if (row?.full_name) setReferrerName(row.full_name);
     };
     lookup();
   }, [refCode]);
