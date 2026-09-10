@@ -86,25 +86,7 @@ const Signup = () => {
     // Handle referral if ref code present
     if (refCode && signUpData.user) {
       try {
-        const { data: referrer } = await supabase
-          .from("profiles")
-          .select("user_id")
-          .eq("referral_code", refCode)
-          .single();
-
-        if (referrer) {
-          await supabase
-            .from("profiles")
-            .update({ referred_by: referrer.user_id })
-            .eq("user_id", signUpData.user.id);
-
-          await supabase.from("referrals").insert({
-            referrer_id: referrer.user_id,
-            referred_id: signUpData.user.id,
-            reward_amount: 0,
-            status: "pending",
-          });
-        }
+        await supabase.rpc("register_referral" as any, { p_code: refCode });
       } catch {
         // Referral tracking is non-critical
       }
