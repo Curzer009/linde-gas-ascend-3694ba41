@@ -1,60 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @layer base {
+  /* AGRILINK — cinematic "Earth & Shadow" */
   :root {
-    --background: 222 47% 6%;
-    --foreground: 40 20% 92%;
+    --background: 150 7% 5.5%;          /* #0D0F0E */
+    --foreground: 44 18% 88%;           /* #E6E3DB */
+    --heading: 0 0% 100%;
 
-    --card: 222 40% 9%;
-    --card-foreground: 40 20% 92%;
+    --card: 150 8% 8%;
+    --card-foreground: 44 18% 88%;
 
-    --popover: 222 40% 9%;
-    --popover-foreground: 40 20% 92%;
+    --popover: 150 8% 7%;
+    --popover-foreground: 44 18% 88%;
 
-    --primary: 210 90% 56%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 39 76% 57%;              /* #E5A93C */
+    --primary-foreground: 150 7% 5.5%;
 
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 40 20% 85%;
+    --secondary: 136 28% 16%;           /* #1E3524 */
+    --secondary-foreground: 44 18% 88%;
 
-    --muted: 222 25% 12%;
-    --muted-foreground: 220 15% 55%;
+    --muted: 150 6% 11%;
+    --muted-foreground: 44 8% 62%;
 
-    --accent: 210 80% 45%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 136 28% 16%;
+    --accent-foreground: 44 20% 92%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 4 72% 56%;
+    --destructive-foreground: 44 18% 96%;
 
-    --border: 222 20% 18%;
-    --input: 222 20% 18%;
-    --ring: 210 90% 56%;
+    --border: 140 8% 15%;
+    --input: 140 8% 17%;
+    --ring: 39 76% 57%;
 
     --radius: 0.75rem;
 
-    --gold: 210 90% 56%;
-    --gold-dark: 215 80% 40%;
-    --gold-light: 205 100% 70%;
-    --navy: 222 47% 6%;
-    --navy-light: 222 30% 14%;
+    --gold: 39 76% 57%;
+    --gold-dark: 34 70% 42%;
+    --gold-light: 42 85% 70%;
+    --navy: 150 7% 5.5%;
+    --navy-light: 136 28% 16%;
 
-    --gradient-gold: linear-gradient(135deg, hsl(210 90% 56%), hsl(200 100% 65%));
-    --gradient-card: linear-gradient(180deg, hsl(222 40% 11%), hsl(222 40% 7%));
-    --shadow-gold: 0 0 40px -10px hsl(210 90% 56% / 0.3);
-    --shadow-card: 0 20px 60px -15px hsl(0 0% 0% / 0.5);
+    --forest: 136 28% 16%;
+    --forest-foreground: 44 30% 80%;
 
-    --sidebar-background: 222 40% 9%;
-    --sidebar-foreground: 40 20% 92%;
-    --sidebar-primary: 210 90% 56%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 40 20% 85%;
-    --sidebar-border: 222 20% 18%;
-    --sidebar-ring: 210 90% 56%;
+    --signal: 158 84% 52%;
+    --signal-foreground: 240 9% 4%;
+
+    --gradient-gold: linear-gradient(135deg, hsl(39 76% 57%), hsl(44 88% 72%));
+    --gradient-card: linear-gradient(180deg, hsl(150 8% 9% / 0.7), hsl(150 7% 6% / 0.7));
+    --shadow-gold: 0 0 40px -10px hsl(39 76% 57% / 0.35);
+    --shadow-card: 0 24px 60px -20px hsl(0 0% 0% / 0.7);
+
+    --sidebar-background: 150 8% 7%;
+    --sidebar-foreground: 44 18% 88%;
+    --sidebar-primary: 39 76% 57%;
+    --sidebar-primary-foreground: 150 7% 5.5%;
+    --sidebar-accent: 136 28% 16%;
+    --sidebar-accent-foreground: 44 18% 88%;
+    --sidebar-border: 140 8% 15%;
+    --sidebar-ring: 39 76% 57%;
+  }
+
+  /* CineAnalyse workspace — scoped theme, never inherits AGRILINK colors */
+  .cine {
+    --background: 240 9% 4%;            /* #0A0A0C */
+    --foreground: 240 6% 92%;
+    --heading: 0 0% 100%;
+    --card: 240 7% 7%;
+    --card-foreground: 240 6% 92%;
+    --popover: 240 7% 8%;
+    --popover-foreground: 240 6% 92%;
+    --primary: 38 100% 56%;             /* neon amber */
+    --primary-foreground: 240 9% 4%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 240 6% 88%;
+    --muted: 240 6% 11%;
+    --muted-foreground: 240 5% 58%;
+    --accent: 240 6% 14%;
+    --accent-foreground: 240 6% 92%;
+    --destructive: 0 78% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 15%;
+    --input: 240 6% 18%;
+    --ring: 38 100% 56%;
+    --signal: 158 84% 52%;              /* mint */
+    --signal-foreground: 240 9% 4%;
+    font-family: 'DM Sans', sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
@@ -64,10 +101,13 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Manrope', sans-serif;
     background-image:
-      linear-gradient(hsl(var(--background) / 0.88), hsl(var(--background) / 0.92)),
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(39 76% 57% / 0.07), transparent 70%),
+      radial-gradient(ellipse 120% 80% at 50% 120%, hsl(136 28% 16% / 0.55), transparent 70%),
+      radial-gradient(ellipse at center, transparent 40%, hsl(150 7% 3% / 0.85) 100%),
+      linear-gradient(hsl(var(--background) / 0.9), hsl(var(--background) / 0.94)),
       url('/__l5e/assets-v1/5680bb82-ddb7-4d8b-a085-4af8fef73153/agrilink-bg.jpg');
     background-size: cover;
     background-position: center;
@@ -76,28 +116,67 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Syne', sans-serif;
+    color: hsl(var(--heading));
+    letter-spacing: 0.035em;
+  }
+
+  .cine h1, .cine h2, .cine h3, .cine h4, .cine h5, .cine h6 {
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+    color: hsl(var(--heading));
   }
 }
 
 @layer utilities {
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(210 90% 56%), hsl(200 100% 70%));
+    background: linear-gradient(135deg, hsl(39 76% 57%), hsl(44 92% 74%) 60%, hsl(36 70% 50%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .bg-gradient-gold {
-    background: linear-gradient(135deg, hsl(210 90% 56%), hsl(200 100% 65%));
+    background: linear-gradient(135deg, hsl(39 76% 57%), hsl(44 88% 68%));
   }
 
   .border-gold {
-    border-color: hsl(210 90% 56% / 0.3);
+    border-color: hsl(39 76% 57% / 0.3);
   }
 
   .glow-gold {
-    box-shadow: 0 0 40px -10px hsl(210 90% 56% / 0.4);
+    box-shadow: 0 0 0 1px hsl(39 76% 57% / 0.25), 0 10px 40px -10px hsl(39 76% 57% / 0.5);
+  }
+
+  .glass {
+    background-color: hsl(var(--card) / 0.55);
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    border: 1px solid hsl(var(--foreground) / 0.07);
+  }
+
+  .cine-grade {
+    filter: contrast(1.08) saturate(0.88) brightness(0.92) sepia(0.08);
+  }
+
+  .vignette {
+    position: relative;
+  }
+  .vignette::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, hsl(150 7% 3% / 0.75) 100%);
+  }
+
+  .title-card {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
   .animate-float {
@@ -109,17 +188,45 @@
   }
 
   .animate-fade-up {
-    animation: fadeUp 0.8s ease-out forwards;
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .animate-fade-up-delay {
-    animation: fadeUp 0.8s ease-out 0.2s forwards;
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
     opacity: 0;
   }
 
   .animate-fade-up-delay-2 {
-    animation: fadeUp 0.8s ease-out 0.4s forwards;
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
     opacity: 0;
+  }
+
+  /* CineAnalyse utilities */
+  .cine-glass {
+    background-color: hsl(var(--card) / 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--foreground) / 0.08);
+  }
+  .cine-glow-primary {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 28px -6px hsl(var(--primary) / 0.55);
+  }
+  .cine-glow-signal {
+    box-shadow: 0 0 0 1px hsl(var(--signal) / 0.45), 0 0 24px -6px hsl(var(--signal) / 0.6);
+  }
+  .cine-backdrop {
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, hsl(var(--primary) / 0.07), transparent 70%),
+      radial-gradient(ellipse 50% 40% at 90% 10%, hsl(var(--signal) / 0.05), transparent 70%),
+      linear-gradient(hsl(var(--foreground) / 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.025) 1px, transparent 1px);
+    background-size: auto, auto, 48px 48px, 48px 48px;
+  }
+  .cine-pulse {
+    animation: cinePulse 1.6s ease-in-out infinite;
+  }
+  .cine-fade-in {
+    animation: cineFade 0.5s ease-out both;
   }
 }
 
@@ -136,4 +243,59 @@
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes agriFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cinePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes cineFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- AGRILINK global cinematic polish (unlayered so it wins over utilities) ---------- */
+
+/* Glass cards: every card surface becomes a blurred dark overlay with a hairline border */
+:where(.bg-card, [class*="bg-card/"]) {
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+.bg-card {
+  background-color: hsl(var(--card) / 0.6);
+}
+
+/* Fade loaded data in softly (opacity only so fixed/sticky children keep working) */
+:where(main, section, table tbody tr, .bg-card, [class*="bg-card/"]) {
+  animation: agriFade 0.7s ease-out both;
+}
+
+/* Soft glow on primary actions */
+:where(button, a).bg-gradient-gold,
+:where(button, a).bg-primary {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35), 0 10px 30px -12px hsl(var(--primary) / 0.65);
+  transition: box-shadow 0.35s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+:where(button, a).bg-gradient-gold:hover,
+:where(button, a).bg-primary:hover {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.6), 0 14px 44px -10px hsl(var(--primary) / 0.85);
+}
+
+/* Cinematic grade on photography (logos and provider marks opt out with data-no-grade) */
+:not(.cine) img:not([data-no-grade]):not([src*="network-"]):not([src*="agrilink-mark"]):not([src*="favicon"]) {
+  filter: contrast(1.07) saturate(0.88) brightness(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
